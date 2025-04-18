@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Other dimensions can be defined here -->
+    <dimen name="fab_translation_distance">30dp</dimen>
+</resources>
+

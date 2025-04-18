@@ -1,0 +1,25 @@
+<resources xmlns:font-color="http://schemas.android.com/tools">
+    <string name="app_name">DermaScan AI</string>
+    <string name="expand_menu">Expand menu</string>
+    <string name="registration">Registration</string>
+    <string name="full_name">Full Name&lt;font color=\'#FF0000\'&gt;*&lt;/font&gt;</string>
+    <string name="age">Age&lt;font color=\'#FF0000\'&gt;*&lt;/font&gt;</string>
+    <string name="gender">Gender:&lt;font color=\'#FF0000\'&gt;*&lt;/font&gt;</string>
+    <string name="address">Address&lt;font color=\'#FF0000\'&gt;*&lt;/font&gt;</string>
+    <string name="email">Email&lt;font color=\'#FF0000\'&gt;*&lt;/font&gt;</string>
+    <string name="password">Password&lt;font color=\'#FF0000\'&gt;*&lt;/font&gt;</string>
+    <string name="confirm_password">Confirm Password&lt;font color=\'#FF0000\'&gt;*&lt;/font&gt;</string>
+    <string name="submit">Submit</string>
+    <string name="introDerma">The dermatologist can review AI-generated skin health assessments, manage consultation bookings with users, and access patient history and reports.</string>
+    <string name="close">Close</string>
+    <string name="select">Select</string>
+    <string name="itroUser">Users can scan and identify skin diseases, track their results, book consultations with dermatologists, and leave feedback and ratings after consultations.</string>
+    <string-array name="gender_options">
+        <item>Male</item>
+        <item>Female</item>
+        <item>LGBTQ</item>
+    </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="todo">TODO</string>
+</resources>

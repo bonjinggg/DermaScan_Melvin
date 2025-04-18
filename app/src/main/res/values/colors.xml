@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="lavender">#8692f7</color>
+    <color name="light_purple">#C5BAFF</color>
+    <color name="sky_blue">#C4D9FF</color>
+    <color name="light_sky">#E8F9FF</color>
+    <color name="white2">#FBFBFB</color>
+    <color name="yourAccentColor">#7C4DFF</color>
+    <color name="nav_item_color">#FF000000</color>
+    <color name="yourBackgroundColor">#E8EAF6</color>
+    <color name="nav_item_icon_tint">#8A8A8A</color>
+    <color name="nav_item_selected_color">#3F51B5</color>
+    <color name="nav_item_text_color">#8A8A8A</color>
+    <color name="nav_item_ripple_color">#E1E1E1</color>
+    <color name="blue">#60B5FF</color>
+    <color name="Deep_Indigo">#211C84 </color>
+    <color name="Medium_Periwinkle_Blue">#4D55CC</color>
+    <color name="Lavender_Blue">#7A73D1 </color>
+    <color name="Pale_Lavender">#B5A8D5 </color>
+    <color name="Eggplant">#2E073F </color>
+    <color name="Vivid_Violet">#7A1CAC</color>
+    <color name="Orchid_Purple">#AD49E1</color>
+    <color name="Very_Pale_Lilac">#EBD3F8</color>
+    <color name="Dark_Blue">#0118D8</color>
+    <color name="grey">#E4E0E1</color>
+    <color name="red">@android:color/holo_red_dark</color>
+
+
+
+</resources>

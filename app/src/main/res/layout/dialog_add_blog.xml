@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:backgroundTint="@color/white"
+    android:padding="16dp">
+    <TextView
+        android:id="@+id/textWritePostTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Write a Post"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="10dp" />
+
+    <!-- Separator -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#DDDDDD"
+        android:layout_marginBottom="25dp" />
+
+    <EditText
+        android:id="@+id/etBlogContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:hint="Write a post...." />
+
+    <ImageView
+        android:id="@+id/ivBlogImage"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:visibility="gone"
+        android:scaleType="centerCrop"
+        android:layout_marginTop="10dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/btnChooseImage"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:text="Choose Image"
+        android:clickable="true"
+        android:tag="Insert Image"
+        android:src="@drawable/ic_addimage"
+        android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Attach Image"
+            android:textColor="@color/black"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="10dp"
+            />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnPostBlog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Post"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="25dp"/>
+</LinearLayout>

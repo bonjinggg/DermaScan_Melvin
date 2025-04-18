@@ -1,0 +1,11 @@
+{
+  "Philippines": {
+    "Davao del Norte": {
+      "Tagum City": ["Magugpo East", "Magugpo West"],
+      "Panabo City": ["San Francisco", "Gredu"]
+    },
+    "Davao del Sur": {
+      "Digos City": ["Zone 1", "Zone 2"]
+    }
+  }
+}
