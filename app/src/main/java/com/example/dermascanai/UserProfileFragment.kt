@@ -10,13 +10,23 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.PopupWindow
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.palette.graphics.Palette
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dermascanai.databinding.FragmentProfileUserBinding
+import com.example.dermascanai.databinding.LayoutNotificationPopupBinding
+import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -26,6 +36,14 @@ class UserProfileFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var database: FirebaseDatabase
+    private lateinit var mAuth: FirebaseAuth
+
+    private lateinit var notificationBinding: LayoutNotificationPopupBinding
+    private lateinit var notificationAdapter: NotificationAdapter
+    private val notificationList = mutableListOf<Notification>()
+
+    private val notificationRef = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
+        .getReference("notifications")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +61,100 @@ class UserProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val drawerLayout = binding.drawerLayout
+        val navView = binding.navigationView
+
         database = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
+        mAuth = FirebaseAuth.getInstance()
+
+        val headerView = navView.getHeaderView(0)
+        val closeDrawerBtn = headerView.findViewById<ImageView>(R.id.closeDrawerBtn)
+
+        notificationBinding = LayoutNotificationPopupBinding.inflate(layoutInflater)
+        val popupWindow = PopupWindow(
+            notificationBinding.root,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            true
+        )
+
+        val notifRecyclerView = notificationBinding.notificationRecyclerView
+        notifRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+
+        notificationAdapter = NotificationAdapter(requireContext(), notificationList)
+        notifRecyclerView.adapter = notificationAdapter
+
+        val userId = mAuth.currentUser?.uid
+
+        val userNotificationsRef = notificationRef.child(userId!!)
+        userNotificationsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                notificationList.clear()
+                var hasUnread = false
+                for (notifSnapshot in snapshot.children) {
+                    val notif = notifSnapshot.getValue(Notification::class.java)
+                    notif?.let {
+                        notificationList.add(it)
+                        if (!it.isRead) {
+                            hasUnread = true
+                        }
+                    }
+                }
+
+
+                notificationList.sortByDescending { it.timestamp }
+
+                notificationAdapter.notifyDataSetChanged()
+
+                binding.notificationDot.visibility = if (hasUnread) View.VISIBLE else View.GONE
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(requireContext(), "Failed to load notifications", Toast.LENGTH_SHORT).show()
+            }
+        })
+
+        binding.notificationIcon.setOnClickListener {
+            popupWindow.showAsDropDown(binding.notificationIcon, -100, 20)
+
+            binding.notificationDot.visibility = View.GONE
+
+            userNotificationsRef.get().addOnSuccessListener { snapshot ->
+                for (notifSnapshot in snapshot.children) {
+                    notifSnapshot.ref.child("isRead").setValue(true)
+                }
+            }
+
+        }
+
+        binding.menuIcon.setOnClickListener {
+            val drawerLayout = requireActivity().findViewById<DrawerLayout>(R.id.drawerLayout)
+            drawerLayout.openDrawer(GravityCompat.END)
+        }
+
+
+        closeDrawerBtn.setOnClickListener {
+            drawerLayout.closeDrawer(GravityCompat.END)
+        }
+
+        navView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_settings -> {
+                    Toast.makeText(context, "Settings Clicked", Toast.LENGTH_SHORT).show()
+                }
+                R.id.nav_update_profile -> {
+                    Toast.makeText(context, "Update Profile Clicked", Toast.LENGTH_SHORT).show()
+                }
+                R.id.nav_logout -> {
+                    logoutUser()
+
+                }
+            }
+            drawerLayout.closeDrawers()
+            true
+        }
+
 
         fetchUserData()
         val imageView = binding.bannerImg

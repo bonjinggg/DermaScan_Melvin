@@ -46,7 +46,7 @@
                 binding.homeImg.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_home2))
 
                 // Reset Profile icon to default
-                binding.profileImg.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_profile))
+                binding.profileImg.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_profile2))
             }
 
             binding.navProfile.setOnClickListener {

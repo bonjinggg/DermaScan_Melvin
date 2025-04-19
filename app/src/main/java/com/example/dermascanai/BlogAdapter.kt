@@ -1,6 +1,5 @@
 package com.example.dermascanai
 
-
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.icu.text.SimpleDateFormat
@@ -13,6 +12,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dermascanai.databinding.ItemBlogPostBinding
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import java.sql.Date
 import java.util.Locale
@@ -21,12 +21,27 @@ class BlogAdapter(
     private val context: Context,
     private val blogList: List<BlogPost>,
     private val currentUserId: String,
-    private val currentUserProfilePic: String
+    private val currentUserProfilePic: String,
+    private var currentUserName: String
 ) : RecyclerView.Adapter<BlogAdapter.BlogViewHolder>() {
 
     private val firebaseInstance = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
+    private val currentUser = FirebaseAuth.getInstance().currentUser?.uid
 
     inner class BlogViewHolder(val binding: ItemBlogPostBinding) : RecyclerView.ViewHolder(binding.root)
+
+    init {
+        currentUser?.let { uid ->
+            firebaseInstance.getReference("userInfo").child(uid)
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    val user = snapshot.getValue(UserInfo::class.java)
+                    if (user != null && user.name != null) {
+                        currentUserName = user.name!!
+                    }
+                }
+        }
+    }
 
     private fun updateCommentCountInUI(holder: BlogViewHolder, newCommentCount: Int) {
 //        holder.binding.commentCount.text = "$newCommentCount"
@@ -70,7 +85,6 @@ class BlogAdapter(
             if (!isVisible) loadComments(holder, post.postId)
         }
 
-        // Like button UI update
         blogRef.child("likes").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val userLiked = snapshot.hasChild(currentUserId)
@@ -82,7 +96,6 @@ class BlogAdapter(
             override fun onCancelled(error: DatabaseError) {}
         })
 
-        // Like button click logic
         holder.binding.heart.setOnClickListener {
             blogRef.runTransaction(object : Transaction.Handler {
                 override fun doTransaction(mutableData: MutableData): Transaction.Result {
@@ -105,26 +118,59 @@ class BlogAdapter(
                 override fun onComplete(error: DatabaseError?, committed: Boolean, currentData: DataSnapshot?) {
                     if (committed) {
                         val updated = currentData?.getValue(BlogPost::class.java)
-                        holder.binding.heart.setImageResource(
-                            if (updated?.likes?.containsKey(currentUserId) == true)
-                                R.drawable.ic_heart_filled
-                            else
-                                R.drawable.ic_heart_outline
-                        )
-                        holder.binding.heartCount.text = updated?.likeCount.toString()
+                        updated?.let {
+
+                            holder.binding.heart.setImageResource(
+                                if (it.likes?.containsKey(currentUserId) == true)
+                                    R.drawable.ic_heart_filled
+                                else
+                                    R.drawable.ic_heart_outline
+                            )
+                            holder.binding.heartCount.text = it.likeCount.toString()
+
+                            if (updated.userId != currentUserId) {
+                                val notificationId = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("notifications").push().key
+                                val notification = Notification(
+                                    notificationId = notificationId ?: return,
+                                    postId = updated.postId,
+                                    fromUserId = currentUserId,
+                                    toUserId = updated.userId,
+                                    type = "like",
+                                    message = "$currentUserName liked your post.",
+                                    timestamp = System.currentTimeMillis()
+                                )
+
+                                // Ensure notification is saved correctly
+                                notificationId?.let { notifId ->
+                                    FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("notifications")
+                                        .child(updated.userId)
+                                        .child(notifId)
+                                        .setValue(notification)
+                                        .addOnCompleteListener { task ->
+                                            if (task.isSuccessful) {
+                                                Log.d("BlogAdapter", "Notification saved successfully.")
+                                            } else {
+                                                Log.e("BlogAdapter", "Failed to save notification: ${task.exception?.message}")
+                                            }
+                                        }
+                                }
+                            }
+                        }
                     } else {
                         Log.e("BlogAdapter", "Transaction failed: ${error?.message}")
                     }
                 }
+
             })
         }
 
-        // Send comment
+
         holder.binding.sendBtn.setOnClickListener {
             val commentText = holder.binding.post.text.toString().trim()
             if (commentText.isNotEmpty()) {
                 val commentRef = firebaseInstance.getReference("comments").child(post.postId)
                 val commentId = commentRef.push().key ?: return@setOnClickListener
+
 
                 val comment = Comment(
                     commentId = commentId,
@@ -137,28 +183,40 @@ class BlogAdapter(
 
                 commentRef.child(commentId).setValue(comment)
                     .addOnSuccessListener {
-                        // Increment the comment count for the blog post
+
+                        holder.binding.post.text.clear()
+
                         updateCommentCount(post, holder)
 
-                        holder.binding.post.setText("")
-                        Toast.makeText(context, "Comment posted!", Toast.LENGTH_SHORT).show()
+                        val notificationRef = firebaseInstance.getReference("notifications")
+                        val notificationId = notificationRef.push().key ?: return@addOnSuccessListener
+
+                        val notification = Notification(
+                            notificationId = notificationId,
+                            postId = post.postId,
+                            fromUserId = currentUserId,
+                            toUserId = post.userId,
+                            type = "comment",
+                            message = "$currentUserName commented on your post.",
+                            timestamp = System.currentTimeMillis()
+                        )
+
+                        notificationRef.child(post.userId).child(notificationId).setValue(notification)
                     }
-                    .addOnFailureListener { error ->
-                        Toast.makeText(context, "Failed to post comment: ${error.message}", Toast.LENGTH_SHORT).show()
-                    }
-            } else {
-                Toast.makeText(context, "Comment cannot be empty", Toast.LENGTH_SHORT).show()
             }
         }
 
         firebaseInstance.getReference("comments").child(post.postId)
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
+
                     comments.clear()
                     for (commentSnap in snapshot.children) {
                         val comment = commentSnap.getValue(Comment::class.java)
                         comment?.let { comments.add(it) }
                     }
+
+                    comments.sortByDescending { it.timestamp }
                     commentAdapter.notifyDataSetChanged()
                 }
 
@@ -172,7 +230,6 @@ class BlogAdapter(
             override fun doTransaction(mutableData: MutableData): Transaction.Result {
                 val blog = mutableData.getValue(BlogPost::class.java) ?: return Transaction.success(mutableData)
 
-                // Increment the comment count
                 blog.commentCount = (blog.commentCount + 1)
 
                 mutableData.value = blog
@@ -183,7 +240,6 @@ class BlogAdapter(
                 if (committed) {
                     val updated = currentData?.getValue(BlogPost::class.java)
 
-                    // Update the comment count UI with the new value
                     updated?.let { updateCommentCountInUI(holder, it.commentCount) }
                 } else {
                     Log.e("BlogAdapter", "Transaction failed: ${error?.message}")
@@ -203,6 +259,7 @@ class BlogAdapter(
                     val comment = snap.getValue(Comment::class.java)
                     comment?.let { commentList.add(it) }
                 }
+                commentList.sortByDescending { it.timestamp }
 
                 holder.binding.recyclerViewComment.layoutManager = LinearLayoutManager(holder.itemView.context)
                 holder.binding.recyclerViewComment.adapter = AdapterComment(context, commentList)
