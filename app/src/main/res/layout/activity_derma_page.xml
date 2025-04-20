@@ -23,7 +23,6 @@
         android:layout_marginBottom="100dp"
         android:visibility="gone">
 
-        <!-- Scan FAB and Label -->
         <LinearLayout
 
             android:layout_width="wrap_content"

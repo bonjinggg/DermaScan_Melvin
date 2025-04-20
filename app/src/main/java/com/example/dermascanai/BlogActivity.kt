@@ -14,10 +14,8 @@
     import androidx.appcompat.app.AppCompatActivity
     import androidx.core.view.GravityCompat
     import androidx.recyclerview.widget.LinearLayoutManager
-    import androidx.recyclerview.widget.RecyclerView
     import com.example.dermascanai.databinding.ActivityBlogBinding
     import com.example.dermascanai.databinding.DialogAddBlogBinding
-    import com.example.dermascanai.databinding.ItemBlogPostBinding
     import com.example.dermascanai.databinding.LayoutNotificationPopupBinding
     import com.google.android.material.bottomsheet.BottomSheetDialog
     import com.google.firebase.auth.FirebaseAuth
@@ -148,15 +146,19 @@
 
             navView.setNavigationItemSelectedListener { menuItem ->
                 when (menuItem.itemId) {
-                    R.id.nav_settings -> {
+                    R.id.settings -> {
                         Toast.makeText(this, "Settings Clicked", Toast.LENGTH_SHORT).show()
                     }
-                    R.id.nav_update_profile -> {
-                        Toast.makeText(this, "Update Profile Clicked", Toast.LENGTH_SHORT).show()
+                    R.id.nav_terms -> {
+                        val intent = Intent(this, TermsConditions::class.java)
+                        startActivity(intent)
+                    }
+                    R.id.privacy -> {
+                        val intent = Intent(this, PrivacyPolicy::class.java)
+                        startActivity(intent)
                     }
                     R.id.nav_logout -> {
                         logoutUser()
-
                     }
                 }
                 drawerLayout.closeDrawers()

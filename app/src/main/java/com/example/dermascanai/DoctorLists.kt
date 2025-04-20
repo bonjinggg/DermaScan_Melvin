@@ -22,9 +22,9 @@ class DoctorLists : AppCompatActivity() {
         binding = ActivityDoctorListsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val dermaList = mutableListOf<User>()
+        val dermaList = mutableListOf<UserInfo>()
 
-        val databaseRef = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("users")
+        val databaseRef = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("userInfo")
 
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         databaseRef.addValueEventListener(object : ValueEventListener {
@@ -32,9 +32,9 @@ class DoctorLists : AppCompatActivity() {
                 dermaList.clear()
                 var count = 0
                 for (userSnap in snapshot.children) {
-                    val user = userSnap.getValue(User::class.java)
+                    val user = userSnap.getValue(UserInfo::class.java)
                     if (user != null) {
-                        println("User found: ${user.fullName}, role: ${user.role}")
+                        println("User found: ${user.name}, role: ${user.role}")
                         if (user.role.lowercase() == "derma") {
                             dermaList.add(user)
                             count++

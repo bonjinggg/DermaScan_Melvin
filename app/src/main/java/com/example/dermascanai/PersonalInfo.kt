@@ -99,7 +99,6 @@ class PersonalInfo : AppCompatActivity() {
         barangaySpinner.visibility = View.GONE
 
         binding.saveBtn.setOnClickListener {
-            // Use new image if selected, otherwise use existing one
             encodeImg = selectedBitmap?.let { encodeImage(it) } ?: existingProfileImage
             saveInfo()
         }

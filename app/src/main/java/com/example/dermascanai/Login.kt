@@ -3,11 +3,14 @@ package com.example.dermascanai
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.bumptech.glide.Glide
 import com.example.dermascanai.databinding.ActivityLoginBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -15,6 +18,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.R
 
 
 class Login : AppCompatActivity() {
@@ -36,6 +40,8 @@ class Login : AppCompatActivity() {
 
             redirectToRolePage()
         }
+
+
 
         binding.loginButton.setOnClickListener {
             loginUser()
@@ -81,7 +87,7 @@ class Login : AppCompatActivity() {
 
                         if (role != null) {
                             val intent = when (role) {
-                                "dermatologist" -> Intent(this@Login, DermaPage::class.java)
+                                "derma" -> Intent(this@Login, DermaPage::class.java)
                                 "user" -> Intent(this@Login, UserPage::class.java)
                                 "admin" -> Intent(this@Login, AdminPage::class.java)
                                 else -> {
@@ -121,5 +127,14 @@ class Login : AppCompatActivity() {
                     Toast.makeText(this, "Error: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }
+    }
+
+    private fun showProgressBar() {
+        binding.progressContainer.visibility = View.VISIBLE
+    }
+
+    // Hide progress bar using binding
+    private fun hideProgressBar() {
+        binding.progressContainer.visibility = View.GONE
     }
 }

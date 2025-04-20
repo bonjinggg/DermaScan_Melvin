@@ -30,6 +30,7 @@
     <color name="Very_Pale_Lilac">#EBD3F8</color>
     <color name="Dark_Blue">#0118D8</color>
     <color name="grey">#E4E0E1</color>
+    <color name="darkgrey">#7A7A7A</color>
     <color name="red">@android:color/holo_red_dark</color>
 
 

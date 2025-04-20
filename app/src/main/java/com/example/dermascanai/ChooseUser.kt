@@ -55,7 +55,7 @@ class ChooseUser : AppCompatActivity() {
         }
 
         binding.dermaBtn.setOnClickListener {
-            navigateToRegister("derma")
+            navigateToDermaRegister("derma")
         }
 
         binding.userBtn.setOnClickListener {
@@ -68,4 +68,11 @@ class ChooseUser : AppCompatActivity() {
         intent.putExtra("USER_ROLE", role)
         startActivity(intent)
     }
+
+    private fun navigateToDermaRegister(role: String) {
+        val intent = Intent(this, DermaRegister::class.java)
+        intent.putExtra("USER_ROLE", role)
+        startActivity(intent)
+    }
+
 }

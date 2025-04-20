@@ -2,6 +2,7 @@ package com.example.dermascanai
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -46,7 +47,7 @@ class DermaPage : AppCompatActivity() {
             binding.homeImg.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_home2))
 
             // Reset Profile icon to default
-            binding.profileImg.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_profile))
+            binding.profileImg.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_profile2))
         }
 
         binding.navProfile.setOnClickListener {
@@ -62,7 +63,7 @@ class DermaPage : AppCompatActivity() {
         }
 
         supportFragmentManager.beginTransaction()
-            .replace(R.id.nav_host_fragment, UserHomeFragment())
+            .replace(R.id.nav_host_fragment, DermaHomeFragment())
             .commit()
 
         binding.fabMain.setOnClickListener {
@@ -81,11 +82,13 @@ class DermaPage : AppCompatActivity() {
 
 
         binding.fabScan.setOnClickListener {
-            Toast.makeText(this, "Scan Clicked", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, MainPage::class.java)
+            startActivity(intent)
         }
 
         binding.fabBlog.setOnClickListener {
-            Toast.makeText(this, "Blog Clicked", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, BlogActivity::class.java)
+            startActivity(intent)
         }
     }
 
@@ -93,7 +96,7 @@ class DermaPage : AppCompatActivity() {
         val fabTranslationDistance = resources.getDimension(R.dimen.fab_translation_distance)
 
         if (!isFabMenuOpen) {
-            // Reset state before showing
+
             binding.fabMenuLayout.apply {
                 visibility = View.VISIBLE
                 alpha = 0f

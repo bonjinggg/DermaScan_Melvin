@@ -45,7 +45,6 @@
                 closeFabMenu()
                 binding.homeImg.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_home2))
 
-                // Reset Profile icon to default
                 binding.profileImg.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_profile2))
             }
 
@@ -57,7 +56,6 @@
                 closeFabMenu()
                 binding.profileImg.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_profile2a))
 
-                // Reset Home icon to default
                 binding.homeImg.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_home))
             }
 
@@ -86,7 +84,8 @@
 
 
             binding.fabScan.setOnClickListener {
-                Toast.makeText(this, "Scan Clicked", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, MainPage::class.java)
+                startActivity(intent)
             }
 
             binding.fabBlog.setOnClickListener {
@@ -100,7 +99,7 @@
             val fabTranslationDistance = resources.getDimension(R.dimen.fab_translation_distance)
 
             if (!isFabMenuOpen) {
-                // Reset state before showing
+
                 binding.fabMenuLayout.apply {
                     visibility = View.VISIBLE
                     alpha = 0f

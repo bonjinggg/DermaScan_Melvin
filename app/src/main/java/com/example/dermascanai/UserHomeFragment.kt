@@ -46,10 +46,10 @@ class UserHomeFragment : Fragment() {
     private val notificationRef = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
         .getReference("notifications")
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//
+//    }
 
 
 
@@ -59,7 +59,6 @@ class UserHomeFragment : Fragment() {
     ): View? {
         _binding = FragmentHomeUserBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -142,7 +141,7 @@ class UserHomeFragment : Fragment() {
             }
         }
 
-        binding.doctorList.setOnClickListener {
+        binding.dermaList.setOnClickListener {
             val intent = Intent(requireContext(), DoctorLists::class.java)
             startActivity(intent)
         }
@@ -160,11 +159,16 @@ class UserHomeFragment : Fragment() {
 
         navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.nav_settings -> {
+                R.id.settings -> {
                     Toast.makeText(context, "Settings Clicked", Toast.LENGTH_SHORT).show()
                 }
-                R.id.nav_update_profile -> {
-                    Toast.makeText(context, "Update Profile Clicked", Toast.LENGTH_SHORT).show()
+                R.id.nav_terms -> {
+                    val intent = Intent(requireContext(), TermsConditions::class.java)
+                    startActivity(intent)
+                }
+                R.id.privacy -> {
+                    val intent = Intent(requireContext(), PrivacyPolicy::class.java)
+                    startActivity(intent)
                 }
                 R.id.nav_logout -> {
                     logoutUser()
