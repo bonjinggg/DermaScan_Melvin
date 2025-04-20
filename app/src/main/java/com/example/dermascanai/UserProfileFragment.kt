@@ -140,11 +140,16 @@ class UserProfileFragment : Fragment() {
 
         navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.nav_settings -> {
+                R.id.settings -> {
                     Toast.makeText(context, "Settings Clicked", Toast.LENGTH_SHORT).show()
                 }
-                R.id.nav_update_profile -> {
-                    Toast.makeText(context, "Update Profile Clicked", Toast.LENGTH_SHORT).show()
+                R.id.nav_terms -> {
+                    val intent = Intent(requireContext(), TermsConditions::class.java)
+                    startActivity(intent)
+                }
+                R.id.privacy -> {
+                    val intent = Intent(requireContext(), PrivacyPolicy::class.java)
+                    startActivity(intent)
                 }
                 R.id.nav_logout -> {
                     logoutUser()

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -44,7 +45,17 @@ class Register : AppCompatActivity() {
         mDatabase = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
             .getReference("userInfo")
 
+        binding.submit.isEnabled = false
 
+        binding.checkBox.setOnCheckedChangeListener { _, isChecked ->
+            binding.submit.isEnabled = isChecked
+            binding.submit.setBackgroundColor(
+                if (isChecked)
+                    ContextCompat.getColor(this, R.color.Vivid_Violet) // Replace with your active color
+                else
+                    ContextCompat.getColor(this, android.R.color.darker_gray) // Grey when disabled
+            )
+        }
 
 
         binding.namelayout.hint = Html.fromHtml(getString(R.string.full_name), Html.FROM_HTML_MODE_LEGACY)
@@ -53,6 +64,13 @@ class Register : AppCompatActivity() {
         binding.confirmLayout.hint = Html.fromHtml(getString(R.string.confirm_password), Html.FROM_HTML_MODE_LEGACY)
 
         userRole = intent.getStringExtra("USER_ROLE") ?: "user"
+
+        binding.navTerms.setOnClickListener {
+            val intent = Intent(this, TermsConditions::class.java)
+            startActivity(intent)
+        }
+
+
 
         binding.uploadBtn.setOnClickListener {
             showImagePickerDialog()
@@ -69,25 +87,42 @@ class Register : AppCompatActivity() {
 
     private fun registerUser() {
         val fullName = binding.name.text.toString().trim()
-
         val email = binding.email.text.toString().trim()
         val password = binding.password.text.toString().trim()
         val confirmPassword = binding.confirm.text.toString().trim()
 
+        if (fullName.isEmpty()) {
+            Toast.makeText(this, "Please enter your full name", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (email.isEmpty()) {
+            Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (password.isEmpty()) {
+            Toast.makeText(this, "Please enter your password", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (confirmPassword.isEmpty()) {
+            Toast.makeText(this, "Please confirm your password", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         if (password != confirmPassword) {
             Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
             return
         }
 
-        if (selectedBitmap == null) {
-            Toast.makeText(this, "Please select a profile picture", Toast.LENGTH_SHORT).show()
-            return
+        val base64Image = if (selectedBitmap != null) {
+            encodeImageToBase64(selectedBitmap!!)
+        } else {
+            encodeDefaultProfileToBase64()
         }
 
-        val base64Image = encodeImageToBase64(selectedBitmap!!)
         val hashedPassword = hashPassword(password)
-
         val newUser = UserInfo(fullName, email, hashedPassword, userRole, base64Image)
 
         mAuth.createUserWithEmailAndPassword(email, password)
@@ -105,13 +140,13 @@ class Register : AppCompatActivity() {
                                     Toast.makeText(this, "Failed to save user data", Toast.LENGTH_SHORT).show()
                                 }
                             }
-
                     }
                 } else {
                     Toast.makeText(this, "Auth failed: ${authTask.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }
     }
+
 
     private fun encodeImageToBase64(bitmap: Bitmap): String {
         val outputStream = ByteArrayOutputStream()
@@ -220,4 +255,13 @@ class Register : AppCompatActivity() {
             }
         }
     }
+
+    private fun encodeDefaultProfileToBase64(): String {
+        val defaultBitmap = BitmapFactory.decodeResource(resources, R.drawable.default_profile)
+        val outputStream = ByteArrayOutputStream()
+        defaultBitmap.compress(Bitmap.CompressFormat.JPEG, 60, outputStream)
+        val byteArray = outputStream.toByteArray()
+        return Base64.encodeToString(byteArray, Base64.DEFAULT)
+    }
+
 }

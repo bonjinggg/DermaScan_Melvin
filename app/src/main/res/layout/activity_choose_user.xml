@@ -13,9 +13,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
-        android:text="What type of User You Are?"
+        android:text="What user type are you?"
         android:textSize="25sp"
         android:textStyle="bold"
+        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -110,6 +111,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="gone"
+        android:background="@drawable/bg_square_box"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -168,6 +170,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="gone"
+        android:background="@drawable/bg_square_box"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -176,8 +179,8 @@
         <!-- Close Button -->
         <androidx.cardview.widget.CardView
             android:id="@+id/closeButtonU"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_marginEnd="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"

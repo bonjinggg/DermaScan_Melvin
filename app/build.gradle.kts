@@ -51,7 +51,7 @@ dependencies {
     implementation("org.mindrot:jbcrypt:0.4")
     implementation("androidx.palette:palette:1.0.0")
 
-    implementation("com.github.bumptech.glide:glide:4.15.0")  // Make sure Glide is added
+    implementation("com.github.bumptech.glide:glide:4.15.0")
 
     implementation("androidx.room:room-runtime:2.5.0")
     ksp("androidx.room:room-compiler:2.5.0")
@@ -59,6 +59,9 @@ dependencies {
     ksp("com.google.dagger:hilt-compiler:2.40.5")
 
     implementation ("com.google.android.material:material:1.11.0")
+
+
+
 
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
