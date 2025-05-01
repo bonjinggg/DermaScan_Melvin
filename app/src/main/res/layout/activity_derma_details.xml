@@ -15,13 +15,14 @@
         android:src="@drawable/back_arrow"
         android:layout_margin="10dp"
         android:clickable="true"
+
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView6"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_marginTop="50dp"
         android:layout_marginStart="15dp"
         app:cardCornerRadius="50dp"
@@ -29,6 +30,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
+            android:id="@+id/profile"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/default_profile" />
@@ -40,7 +42,8 @@
         android:layout_height="wrap_content"
         android:text="Full Name"
         android:textColor="@color/black"
-        android:textSize="20sp"
+        android:textSize="18sp"
+        android:layout_marginStart="5dp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/textView7"
         app:layout_constraintStart_toEndOf="@+id/cardView6" />
@@ -51,14 +54,17 @@
         android:layout_height="wrap_content"
         android:text="Dermatologist"
         android:textColor="@color/darkgrey"
-        android:textSize="20sp"
+        android:layout_marginStart="5dp"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@+id/cardView6"
         app:layout_constraintStart_toEndOf="@+id/cardView6" />
 
     <Button
+        android:id="@+id/rateMe"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Rate Me"
+        android:textSize="12sp"
         android:layout_marginEnd="15dp"
         app:layout_constraintBottom_toBottomOf="@+id/cardView6"
         app:layout_constraintEnd_toEndOf="parent"
@@ -71,7 +77,7 @@
         android:layout_marginEnd="5dp"
         android:text="4.5"
         android:textColor="@color/black"
-        android:textSize="25sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/textView21"
         app:layout_constraintEnd_toStartOf="@+id/imageView4"
@@ -94,7 +100,7 @@
         android:layout_marginTop="50dp"
         android:textColor="@color/black"
         android:text="9:00am - 5:00pm"
-        android:textSize="20dp"
+        android:textSize="16sp"
         android:layout_marginStart="10dp"
         app:layout_constraintStart_toEndOf="@+id/imageView5"
         app:layout_constraintTop_toBottomOf="@+id/cardView6" />
@@ -109,30 +115,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/textView21" />
 
-    <TextView
-        android:id="@+id/textView22"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="25dp"
-        android:text="Experience: "
-        android:textColor="@color/darkgrey"
-        android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView21" />
+    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/calendar"
+        app:layout_constraintBottom_toBottomOf="@+id/textView23"
+        app:layout_constraintStart_toStartOf="@+id/imageView5"
+        app:layout_constraintTop_toTopOf="@+id/textView23" />
 
     <TextView
         android:id="@+id/textView23"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:text="3 years"
+        android:layout_marginTop="10dp"
+        android:text="Mon - Fri"
         android:textColor="@color/black"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/textView22"
-        app:layout_constraintStart_toEndOf="@+id/textView22"
-        app:layout_constraintTop_toTopOf="@+id/textView22" />
+        app:layout_constraintStart_toStartOf="@+id/textView21"
+        app:layout_constraintTop_toBottomOf="@+id/textView21" />
 
     <TextView
         android:id="@+id/textView24"
@@ -141,7 +142,7 @@
         android:layout_marginEnd="15dp"
         android:text="Cosmetic"
         android:textColor="@color/black"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/textView23"
         app:layout_constraintEnd_toEndOf="parent"
@@ -154,7 +155,7 @@
         android:layout_marginEnd="5dp"
         android:text="Type:"
         android:textColor="@color/darkgrey"
-        android:textSize="20sp"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@+id/textView24"
         app:layout_constraintEnd_toStartOf="@+id/textView24"
         app:layout_constraintTop_toTopOf="@+id/textView24" />
@@ -175,11 +176,14 @@
 
 
         <TextView
+            android:id="@+id/bio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="15dp"
             android:hint="Content here"
-            android:textSize="20dp" />
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
     </androidx.cardview.widget.CardView>
 
     <TextView
@@ -189,8 +193,9 @@
         android:layout_marginStart="15dp"
         android:layout_marginTop="25dp"
         android:text="Clinic:"
+        android:textStyle="bold"
         android:textColor="@color/black"
-        android:textSize="20sp"
+        android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView7" />
 
@@ -199,8 +204,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Tagum City"
-        android:textSize="20sp"
-        android:textStyle="bold"
+        android:textSize="16sp"
         android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="@+id/textView26"
         app:layout_constraintTop_toBottomOf="@+id/textView26" />
@@ -212,7 +216,8 @@
         android:layout_marginStart="15dp"
         android:layout_marginTop="25dp"
         android:text="Contact:"
-        android:textSize="20sp"
+        android:textSize="16sp"
+        android:textStyle="bold"
         android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView28" />
@@ -224,20 +229,20 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:text="Mobile:"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="@+id/textView27"
         app:layout_constraintTop_toBottomOf="@+id/textView27" />
 
     <TextView
-        android:id="@+id/textView31"
+        android:id="@+id/phone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:text="09123456789"
         android:textColor="@color/black"
-        android:textSize="20sp"
-        android:textStyle="bold"
+        android:textSize="16sp"
+
         app:layout_constraintBottom_toBottomOf="@+id/textView29"
         app:layout_constraintStart_toEndOf="@+id/textView29"
         app:layout_constraintTop_toTopOf="@+id/textView29" />
@@ -249,18 +254,19 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="Facebook:"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="@+id/textView29"
         app:layout_constraintTop_toBottomOf="@+id/textView29" />
 
     <TextView
+        android:id="@+id/fbAccnt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="FB Name/email"
         android:textColor="@color/black"
-        android:textSize="20sp"
-        android:textStyle="bold"
+        android:textSize="16sp"
+
         android:layout_marginStart="5dp"
         app:layout_constraintBottom_toBottomOf="@+id/textView30"
         app:layout_constraintStart_toEndOf="@+id/textView30"
@@ -272,18 +278,19 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="GMail:"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="@+id/textView30"
         app:layout_constraintTop_toBottomOf="@+id/textView30" />
 
     <TextView
+        android:id="@+id/gmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="derma@gmail.com"
         android:textColor="@color/black"
-        android:textSize="20sp"
-        android:textStyle="bold"
+        android:textSize="16sp"
+
         android:layout_marginStart="5dp"
         app:layout_constraintBottom_toBottomOf="@+id/textView32"
         app:layout_constraintStart_toEndOf="@+id/textView32"
@@ -296,6 +303,21 @@
         android:text="Make an Appointment"
         android:layout_marginBottom="25dp"
         android:layout_marginTop="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Not Verified Yet"
+        android:textColor="@color/grey"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="25dp"
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

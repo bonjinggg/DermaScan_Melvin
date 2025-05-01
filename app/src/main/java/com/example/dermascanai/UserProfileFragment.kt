@@ -64,6 +64,8 @@ class UserProfileFragment : Fragment() {
         val drawerLayout = binding.drawerLayout
         val navView = binding.navigationView
 
+
+
         database = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
         mAuth = FirebaseAuth.getInstance()
 
@@ -222,6 +224,8 @@ class UserProfileFragment : Fragment() {
 
             dialog.show()
         }
+
+
 
 
 

@@ -27,6 +27,8 @@ class Booking : AppCompatActivity() {
         binding = ActivityBookingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val docEmail = intent.getStringExtra("doctorEmail")
+
 
         binding.calendarView.setWeekSeparatorLineColor(Color.BLACK)
         binding.calendarView.setFocusedMonthDateColor(Color.BLACK)
@@ -50,7 +52,7 @@ class Booking : AppCompatActivity() {
 
         val timeButtons = listOf(
             binding.btn910, binding.btn1011, binding.btn1112,
-            binding.btn12, binding.btn23, binding.btn34
+            binding.btn12, binding.btn23, binding.btn34, binding.btn45
         )
 
         for (btn in timeButtons) {
@@ -64,14 +66,45 @@ class Booking : AppCompatActivity() {
             }
         }
 
-//        binding.btnConfirm.setOnClickListener {
-//            if (selectedDate == 0L || selectedTimeText.isEmpty()) {
-//                Toast.makeText(this, "Please select a date and time slot", Toast.LENGTH_SHORT).show()
-//            } else {
-//                val date = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(Date(selectedDate))
-//                Toast.makeText(this, "Booked on $date at $selectedTimeText", Toast.LENGTH_LONG).show()
-//            }
-//
-//        }
+        binding.btnConfirm.setOnClickListener {
+            if (selectedDate == 0L || selectedTimeText.isEmpty()) {
+                Toast.makeText(this, "Please select a date and time slot", Toast.LENGTH_SHORT).show()
+            } else {
+                binding.btnConfirm.setOnClickListener {
+                    if (selectedDate == 0L || selectedTimeText.isEmpty()) {
+                        Toast.makeText(this, "Please select a date and time slot", Toast.LENGTH_SHORT).show()
+                    } else {
+                        // Format the selected date
+                        val formattedDate = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(Date(selectedDate))
+
+                        // Convert time slot if needed
+                        val formattedTime = formatTimeSlot(selectedTimeText)
+
+                        // Pass to next activity
+                        val intent = Intent(this, ConfirmBooking::class.java)
+                        intent.putExtra("selectedDate", formattedDate)
+                        intent.putExtra("selectedTime", formattedTime)
+                        intent.putExtra("doctorEmail", docEmail)
+                        startActivity(intent)
+                    }
+                }
+
+            }
+
+        }
+    }
+
+    private fun formatTimeSlot(rawSlot: String): String {
+        return when (rawSlot) {
+            "9-10 AM" -> "9:00am to 10:00am"
+            "10-11 AM" -> "10:00am to 11:00am"
+            "11-12 PM" -> "11:00am to 12:00pm"
+            "1-2 PM" -> "1:00pm to 2:00pm"
+            "2-3 PM" -> "2:00pm to 3:00pm"
+            "3-4 PM" -> "3:00pm to 4:00pm"
+            "4-5 PM" -> "4:00pm to 5:00pm"
+
+            else -> rawSlot  // fallback if already formatted
+        }
     }
 }

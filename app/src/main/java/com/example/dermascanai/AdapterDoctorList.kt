@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dermascanai.databinding.ItemDermaUserBinding
 
-class AdapterDoctorList(private val userList: List<UserInfo>) :
+class AdapterDoctorList(private val userList: List<DermaInfo>) :
     RecyclerView.Adapter<AdapterDoctorList.DermaUserViewHolder>() {
 
     inner class DermaUserViewHolder(val binding: ItemDermaUserBinding) :
@@ -40,13 +40,11 @@ class AdapterDoctorList(private val userList: List<UserInfo>) :
             root.setOnClickListener {
                 val context = it.context
                 val intent = Intent(context, DermaDetails::class.java).apply {
-                    putExtra("fullName", user.name)
-                    putExtra("email", user.email)
-                    putExtra("imageUrl", user.name)
-
+                    putExtra("userEmail", user.email) // assuming userId is in your DermaInfo model
                 }
                 context.startActivity(intent)
             }
+
         }
     }
 

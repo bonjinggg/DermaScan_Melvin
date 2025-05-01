@@ -18,6 +18,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.dermascanai.BlogActivity
+import com.example.dermascanai.DoctorLists
 import com.example.dermascanai.databinding.FragmentHomeUserBinding
 import com.example.dermascanai.databinding.LayoutNotificationPopupBinding
 import com.google.android.material.navigation.NavigationView
@@ -73,6 +74,11 @@ class UserHomeFragment : Fragment() {
 
         mAuth = FirebaseAuth.getInstance()
         mDatabase = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("userInfo")
+
+
+        val dermaList = mutableListOf<DermaInfo>()
+        val databaseRef = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("dermaInfo")
+
 
         val headerView = navView.getHeaderView(0)
         val closeDrawerBtn = headerView.findViewById<ImageView>(R.id.closeDrawerBtn)
@@ -178,6 +184,52 @@ class UserHomeFragment : Fragment() {
             drawerLayout.closeDrawers()
             true
         }
+
+        val tipRef = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
+            .getReference("dailyTips")
+
+        val tipId = ((System.currentTimeMillis() / (1000 * 60 * 60 * 24)) % 20 + 1).toInt()
+
+        tipRef.child(tipId.toString()).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val tip = snapshot.getValue(String::class.java)
+                if (tip != null) {
+                    binding.dailyTips.text = tip
+                } else {
+                    binding.dailyTips.text = "Stay tuned for more skin care tips!"
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                binding.dailyTips.text = "Failed to load tip."
+                Log.e("DailyTips", "Error: ${error.message}")
+            }
+        })
+
+        binding.dermaRecycleView.layoutManager = LinearLayoutManager(context)
+        databaseRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                dermaList.clear()
+                var count = 0
+                for (userSnap in snapshot.children) {
+                    val user = userSnap.getValue(DermaInfo::class.java)
+                    if (user != null) {
+                        println("User found: ${user.name}, role: ${user.role}")
+                        if (user.role.lowercase() == "derma") {
+                            dermaList.add(user)
+                            count++
+                        }
+                    }
+                }
+
+                binding.dermaRecycleView.adapter = AdapterDermaHomeList(dermaList)
+            }
+
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(requireContext(), "Failed to load users", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
 

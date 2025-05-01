@@ -25,6 +25,7 @@ class Login : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var mAuth: FirebaseAuth
     private lateinit var mDatabase: DatabaseReference
+    private lateinit var dDatabase: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +35,7 @@ class Login : AppCompatActivity() {
         mAuth = FirebaseAuth.getInstance()
         val database = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
         mDatabase = database.getReference("userInfo")
-
+        dDatabase = database.getReference("dermaInfo")
         val currentUser = mAuth.currentUser
         if (currentUser != null){
 
@@ -100,7 +101,35 @@ class Login : AppCompatActivity() {
                                 finish()  // Close login screen after successful redirection
                             }
                         } else {
-                            Toast.makeText(this@Login, "No role found for this user", Toast.LENGTH_SHORT).show()
+                            dDatabase.child(userId).child("role")
+                                .addListenerForSingleValueEvent(object : ValueEventListener {
+                                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                                        val role = dataSnapshot.getValue(String::class.java)
+                                        Log.d("LoginActivity", "User role: $role")
+
+                                        if (role != null) {
+                                            val intent = when (role) {
+                                                "derma" -> Intent(this@Login, DermaPage::class.java)
+                                                "user" -> Intent(this@Login, UserPage::class.java)
+                                                "admin" -> Intent(this@Login, AdminPage::class.java)
+                                                else -> {
+                                                    Toast.makeText(this@Login, "Unknown role", Toast.LENGTH_SHORT).show()
+                                                    null
+                                                }
+                                            }
+                                            intent?.let {
+                                                startActivity(it)
+                                                finish()  // Close login screen after successful redirection
+                                            }
+                                        } else {
+                                            Toast.makeText(this@Login, "No role found for this user", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+
+                                    override fun onCancelled(databaseError: DatabaseError) {
+                                        Toast.makeText(this@Login, "Error: ${databaseError.message}", Toast.LENGTH_SHORT).show()
+                                    }
+                                })
                         }
                     }
 

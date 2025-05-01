@@ -5,29 +5,29 @@ import android.app.DatePickerDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.util.Base64
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.example.dermascanai.PersonalInfo
-
 import com.example.dermascanai.databinding.ActivityDermaEditInfoBinding
-import com.example.dermascanai.databinding.ActivityPersonalInfoBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import retrofit2.Call
 import retrofit2.Callback
@@ -78,6 +78,12 @@ class DermaEditInfo : AppCompatActivity() {
             updateLabel()
         }
 
+        fetchUserData()
+
+        provinceSpinner = binding.spinnerProvince
+        citySpinner = binding.spinnerCity
+        barangaySpinner = binding.spinnerBarangay
+
         binding.backBtn.setOnClickListener {
             onBackPressed()
         }
@@ -94,11 +100,12 @@ class DermaEditInfo : AppCompatActivity() {
                 show()
             }
         }
+        citySpinner.visibility = View.GONE
+        barangaySpinner.visibility = View.GONE
+
 
         fetchProvinces()
 
-        citySpinner.visibility = View.GONE
-        barangaySpinner.visibility = View.GONE
 
 
         binding.gender.adapter = genderAdapter
@@ -117,6 +124,18 @@ class DermaEditInfo : AppCompatActivity() {
         binding.uploadType.setOnClickListener {
             showCertificatePickerDialog()
         }
+
+        val validationText = "Validation*"
+        val spannable = SpannableString(validationText)
+        spannable.setSpan(
+            ForegroundColorSpan(Color.RED),
+            validationText.length - 1,
+            validationText.length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        binding.textValid.text = spannable
+
 
 
     }
@@ -185,14 +204,22 @@ class DermaEditInfo : AppCompatActivity() {
         }
 
         if (userId != null) {
-            user.child(userId).updateChildren(userInfoMap)
-                .addOnSuccessListener {
-                    Toast.makeText(this, "User info saved!", Toast.LENGTH_SHORT).show()
-                    finish()
-                }
-                .addOnFailureListener {
-                    Toast.makeText(this, "Failed to save info: ${it.message}", Toast.LENGTH_SHORT).show()
-                }
+            if(selectedType != null) {
+                user.child(userId).updateChildren(userInfoMap)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "User info saved!", Toast.LENGTH_SHORT).show()
+                        finish()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(
+                            this,
+                            "Failed to save info: ${it.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+            }else{
+                Toast.makeText(this, "Please provide a validation before proceeding.", Toast.LENGTH_SHORT).show()
+            }
         } else {
             Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show()
         }
@@ -392,6 +419,36 @@ class DermaEditInfo : AppCompatActivity() {
         } else {
             val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             startActivityForResult(cameraIntent, REQUEST_CERTIFICATE_CAMERA)
+        }
+    }
+    private fun fetchUserData() {
+        val userRef: DatabaseReference = database.getReference("dermaInfo").child(userId ?: return)
+
+        userRef.get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()) {
+                val userInfo = snapshot.getValue(UserInfo::class.java)
+
+                binding.name.setText(userInfo?.name ?: "")
+                binding.birthday.setText(userInfo?.birthday ?: "")
+                binding.contact.setText(userInfo?.contact ?: "")
+                binding.quote.setText(userInfo?.quote ?: "")
+                binding.bio.setText(userInfo?.bio ?: "")
+
+
+                // Set image
+                userInfo?.profileImage?.let {
+                    if (it.isNotEmpty()) {
+                        existingProfileImage = it
+                        val decodedBytes = Base64.decode(it, Base64.DEFAULT)
+                        val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+                        binding.profPic.setImageBitmap(bitmap)
+                    }
+                }
+            } else {
+                Toast.makeText(this, "No user data found", Toast.LENGTH_SHORT).show()
+            }
+        }.addOnFailureListener {
+            Toast.makeText(this, "Failed to fetch user data: ${it.message}", Toast.LENGTH_SHORT).show()
         }
     }
 

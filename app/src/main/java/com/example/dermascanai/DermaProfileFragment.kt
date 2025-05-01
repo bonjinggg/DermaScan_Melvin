@@ -187,7 +187,7 @@ class DermaProfileFragment : Fragment() {
         }
 
         binding.btnToggleInfo.setOnClickListener {
-            val intent = Intent(requireContext(), PersonalInfo::class.java)
+            val intent = Intent(requireContext(), DermaEditInfo::class.java)
             startActivity(intent)
         }
         binding.editBannerIcon.setOnClickListener {
@@ -243,7 +243,7 @@ class DermaProfileFragment : Fragment() {
 
 
                 binding.fullName.setText(dermaInfo?.name ?: "")
-                val text = (dermaInfo?.quote ?: "")
+                val text = (dermaInfo?.status ?: "")
                 binding.status.text = "Status: $text "
 
                 dermaInfo?.profileImage?.let {

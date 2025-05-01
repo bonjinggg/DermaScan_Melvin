@@ -9,6 +9,16 @@
     android:layout_height="match_parent"
     tools:context=".MainPage">
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/backBTN"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/back_arrow"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageView
         android:id="@+id/imageView8"
         android:layout_width="180dp"
@@ -70,7 +80,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/cardView9" />
 
-
             <TextView
                 android:id="@+id/textView41"
                 android:layout_width="wrap_content"
@@ -97,6 +106,19 @@
                 app:layout_constraintTop_toBottomOf="@+id/textView41" />
 
             <TextView
+                android:id="@+id/detailBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="View more details"
+                android:textColor="@color/blue"
+                android:clickable="true"
+                android:visibility="gone"
+                android:layout_marginTop="5dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/resultTextView" />
+
+            <TextView
                 android:id="@+id/text2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -107,7 +129,7 @@
                 android:textSize="15sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/resultTextView" />
+                app:layout_constraintTop_toBottomOf="@+id/detailBtn" />
 
             <TextView
                 android:id="@+id/remedyTextView"
@@ -121,6 +143,31 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/text2" />
+
+            <Button
+                android:id="@+id/saveScanButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Save Scan"
+                android:visibility="gone"
+                android:layout_marginTop="25dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/remedyTextView" />
+
+
+            <!-- ProgressBar added here -->
+            <ProgressBar
+                android:id="@+id/loadingProgressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/remedyTextView"
+                android:indeterminate="true" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
