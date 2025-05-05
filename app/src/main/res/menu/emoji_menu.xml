@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/emoji_1" android:title="😊" />
+    <item android:id="@+id/emoji_2" android:title="😂" />
+    <item android:id="@+id/emoji_3" android:title="😍" />
+    <item android:id="@+id/emoji_4" android:title="😢" />
+    <item android:id="@+id/emoji_5" android:title="👍" />
+    <item android:id="@+id/emoji_6" android:title="❤️" />
+    <item android:id="@+id/emoji_7" android:title="🤔" />
+    <item android:id="@+id/emoji_8" android:title="🙄" />
+    <item android:id="@+id/emoji_9" android:title="😎" />
+    <item android:id="@+id/emoji_10" android:title="😡" />
+    <item android:id="@+id/emoji_11" android:title="😭" />
+    <item android:id="@+id/emoji_12" android:title="😴" />
+    <item android:id="@+id/emoji_13" android:title="🥰" />
+    <item android:id="@+id/emoji_14" android:title="😱" />
+    <item android:id="@+id/emoji_15" android:title="🤯" />
+    <item android:id="@+id/emoji_16" android:title="😇" />
+    <item android:id="@+id/emoji_17" android:title="🤗" />
+    <item android:id="@+id/emoji_18" android:title="😜" />
+    <item android:id="@+id/emoji_19" android:title="😬" />
+    <item android:id="@+id/emoji_20" android:title="👀" />
+    <item android:id="@+id/emoji_21" android:title="👋" />
+    <item android:id="@+id/emoji_22" android:title="🙏" />
+    <item android:id="@+id/emoji_23" android:title="🤝" />
+    <item android:id="@+id/emoji_24" android:title="✌️" />
+    <item android:id="@+id/emoji_25" android:title="👎" />
+    <item android:id="@+id/emoji_26" android:title="👏" />
+    <item android:id="@+id/emoji_27" android:title="🖐️" />
+    <item android:id="@+id/emoji_28" android:title="✋" />
+    <item android:id="@+id/emoji_29" android:title="🫶" />
+</menu>
+
