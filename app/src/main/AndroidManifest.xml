@@ -43,7 +43,7 @@
             android:name=".DermaRecords"
             android:exported="false" />
         <activity
-            android:name=".BookingRecords"
+            android:name=".BookingApprovalRecords"
             android:exported="false" />
         <activity
             android:name=".ScanRecords"

@@ -7,10 +7,7 @@ import android.icu.util.Calendar
 import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.dermascanai.databinding.ActivityBookingBinding
 import java.util.Date
 import java.util.Locale
@@ -20,7 +17,7 @@ class Booking : AppCompatActivity() {
     private var selectedTimeSlot: Button? = null
     private var selectedDate: Long = 0L
     private var selectedTimeText: String = ""
-
+    private var patientEmail: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +26,8 @@ class Booking : AppCompatActivity() {
 
         val docEmail = intent.getStringExtra("doctorEmail")
 
+        // Get current user's email from Firebase Auth
+        patientEmail = intent.getStringExtra("patientEmail") ?: ""
 
         binding.calendarView.setWeekSeparatorLineColor(Color.BLACK)
         binding.calendarView.setFocusedMonthDateColor(Color.BLACK)
@@ -38,16 +37,17 @@ class Booking : AppCompatActivity() {
             finish()
         }
 
-        binding.btnConfirm.setOnClickListener {
-            val intent = Intent(this, ConfirmBooking::class.java)
-            startActivity(intent)
-        }
-
-
         binding.calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
             val calendar = Calendar.getInstance()
             calendar.set(year, month, dayOfMonth)
             selectedDate = calendar.timeInMillis
+
+
+            val today = Calendar.getInstance()
+            if (calendar.before(today) && calendar.get(Calendar.DAY_OF_YEAR) != today.get(Calendar.DAY_OF_YEAR)) {
+                Toast.makeText(this, "You cannot book appointments in the past", Toast.LENGTH_SHORT).show()
+                selectedDate = 0L
+            }
         }
 
         val timeButtons = listOf(
@@ -57,9 +57,7 @@ class Booking : AppCompatActivity() {
 
         for (btn in timeButtons) {
             btn.setOnClickListener {
-
                 selectedTimeSlot?.setBackgroundColor(Color.parseColor("#7A7A7A"))
-
                 btn.setBackgroundColor(Color.parseColor("#FFBB86FC"))
                 selectedTimeSlot = btn
                 selectedTimeText = btn.text.toString()
@@ -70,27 +68,25 @@ class Booking : AppCompatActivity() {
             if (selectedDate == 0L || selectedTimeText.isEmpty()) {
                 Toast.makeText(this, "Please select a date and time slot", Toast.LENGTH_SHORT).show()
             } else {
-                binding.btnConfirm.setOnClickListener {
-                    if (selectedDate == 0L || selectedTimeText.isEmpty()) {
-                        Toast.makeText(this, "Please select a date and time slot", Toast.LENGTH_SHORT).show()
-                    } else {
-                        // Format the selected date
-                        val formattedDate = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(Date(selectedDate))
+                // Format the selected date
+                val formattedDate = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(Date(selectedDate))
 
-                        // Convert time slot if needed
-                        val formattedTime = formatTimeSlot(selectedTimeText)
+                // Convert time slot if needed
+                val formattedTime = formatTimeSlot(selectedTimeText)
 
-                        // Pass to next activity
-                        val intent = Intent(this, ConfirmBooking::class.java)
-                        intent.putExtra("selectedDate", formattedDate)
-                        intent.putExtra("selectedTime", formattedTime)
-                        intent.putExtra("doctorEmail", docEmail)
-                        startActivity(intent)
-                    }
-                }
+                // Prepare a booking ID using timestamp for uniqueness
+                val bookingId = "${System.currentTimeMillis()}"
 
+                // Pass to next activity
+                val intent = Intent(this, ConfirmBooking::class.java)
+                intent.putExtra("selectedDate", formattedDate)
+                intent.putExtra("selectedTime", formattedTime)
+                intent.putExtra("doctorEmail", docEmail)
+                intent.putExtra("patientEmail", patientEmail)
+                intent.putExtra("bookingId", bookingId)
+                intent.putExtra("timestampMillis", selectedDate)
+                startActivity(intent)
             }
-
         }
     }
 
@@ -103,7 +99,6 @@ class Booking : AppCompatActivity() {
             "2-3 PM" -> "2:00pm to 3:00pm"
             "3-4 PM" -> "3:00pm to 4:00pm"
             "4-5 PM" -> "4:00pm to 5:00pm"
-
             else -> rawSlot  // fallback if already formatted
         }
     }
