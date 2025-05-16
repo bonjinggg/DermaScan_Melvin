@@ -19,10 +19,14 @@ class BookingHistory : AppCompatActivity() {
     private lateinit var binding: ActivityBookingHistoryBinding
     private lateinit var appointmentAdapter: AppointmentAdapter
     private val appointmentList = mutableListOf<Appointment>()
+    private val filteredAppointmentList = mutableListOf<Appointment>()
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
     private lateinit var userBookingsRef: DatabaseReference
     private var userBookingsListener: ValueEventListener? = null
+
+    // Current filter
+    private var currentFilter = "pending"
 
     // Database caching and offline support
     private var isDatabaseInitialized = false
@@ -36,13 +40,10 @@ class BookingHistory : AppCompatActivity() {
         initializeFirebase()
 
         setupRecyclerView()
+        setupFilterChips()
 
         binding.backBtn.setOnClickListener {
             finish()
-        }
-
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            loadAppointments()
         }
 
         // Initial loading of appointments
@@ -72,9 +73,98 @@ class BookingHistory : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        appointmentAdapter = AppointmentAdapter(appointmentList)
+        appointmentAdapter = AppointmentAdapter(filteredAppointmentList)
         binding.appointmentsRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.appointmentsRecyclerView.adapter = appointmentAdapter
+    }
+
+    private fun setupFilterChips() {
+        // Set default chip checked
+        binding.pendingFilterChip.isChecked = true
+
+        // Set up click listeners for filter chips
+        binding.pendingFilterChip.setOnClickListener {
+            currentFilter = "pending"
+            applyFilter()
+        }
+
+        binding.declinedFilterChip.setOnClickListener {
+            currentFilter = "declined"
+            applyFilter()
+        }
+
+        binding.approvedFilterChip.setOnClickListener {
+            currentFilter = "approved"
+            applyFilter()
+        }
+
+        binding.ongoingFilterChip.setOnClickListener {
+            currentFilter = "ongoing"
+            applyFilter()
+        }
+
+        binding.allFilterChip.setOnClickListener {
+            currentFilter = "all"
+            applyFilter()
+        }
+    }
+
+    private fun applyFilter() {
+        filteredAppointmentList.clear()
+
+        // Hide all empty state layouts first
+        binding.emptyStateLayout.visibility = View.GONE
+        binding.emptyStateDeclinedLayout.visibility = View.GONE
+        binding.emptyStateApprovedLayout.visibility = View.GONE
+
+        when (currentFilter) {
+            "pending" -> {
+                filteredAppointmentList.addAll(appointmentList.filter {
+                    it.status.lowercase() == "pending"
+                })
+
+                if (filteredAppointmentList.isEmpty()) {
+                    binding.emptyStateLayout.visibility = View.VISIBLE
+                }
+            }
+            "declined" -> {
+                filteredAppointmentList.addAll(appointmentList.filter {
+                    it.status.lowercase() == "declined" || it.status.lowercase() == "cancelled"
+                })
+
+                if (filteredAppointmentList.isEmpty()) {
+                    binding.emptyStateDeclinedLayout.visibility = View.VISIBLE
+                }
+            }
+            "approved" -> {
+                filteredAppointmentList.addAll(appointmentList.filter {
+                    it.status.lowercase() == "confirmed" || it.status.lowercase() == "completed"
+                })
+
+                if (filteredAppointmentList.isEmpty()) {
+                    binding.emptyStateApprovedLayout.visibility = View.VISIBLE
+                }
+            }
+            "ongoing" -> {
+                filteredAppointmentList.addAll(appointmentList.filter {
+                    it.status.lowercase() == "ongoing"
+                })
+
+                if (filteredAppointmentList.isEmpty()) {
+                    binding.emptyStateLayout.visibility = View.VISIBLE
+                }
+            }
+            "all" -> {
+                filteredAppointmentList.addAll(appointmentList)
+
+                if (filteredAppointmentList.isEmpty()) {
+                    binding.emptyStateLayout.visibility = View.VISIBLE
+                }
+            }
+        }
+
+        appointmentAdapter.notifyDataSetChanged()
+        Log.d("BookingHistory", "Applied filter: $currentFilter, showing ${filteredAppointmentList.size} appointments")
     }
 
     private fun loadAppointments() {
@@ -82,12 +172,11 @@ class BookingHistory : AppCompatActivity() {
             Toast.makeText(this, "Please login to view your appointments", Toast.LENGTH_SHORT).show()
             binding.progressBar.visibility = View.GONE
             binding.emptyStateLayout.visibility = View.VISIBLE
-            binding.swipeRefreshLayout.isRefreshing = false
             return
         }
 
         binding.progressBar.visibility = View.VISIBLE
-        binding.emptyStateLayout.visibility = View.GONE
+        hideAllEmptyStates()
 
         // Get current user email and format it for Firebase path
         val userEmail = currentUser.email?.replace(".", ",") ?: ""
@@ -113,39 +202,38 @@ class BookingHistory : AppCompatActivity() {
                         val appointment = bookingSnapshot.getValue(Appointment::class.java)
                         if (appointment != null) {
                             appointmentList.add(appointment)
-                            Log.d("BookingHistory", "Found appointment: ${appointment.bookingId} with doctor ${appointment.doctorName}")
+                            Log.d("BookingHistory", "Found appointment: ${appointment.bookingId} with doctor ${appointment.doctorName}, status: ${appointment.status}")
                         }
                     }
 
                     // Sort appointments by timestamp (most recent first)
                     appointmentList.sortByDescending { it.timestampMillis }
-
-                    // Update empty state message based on what we found
-                    if (appointmentList.isEmpty()) {
-                        binding.emptyStateLayout.text = "No appointments found"
-                    }
                 } else {
                     Log.d("BookingHistory", "No appointments found for user: $userEmail")
-                    binding.emptyStateLayout1.text = "No appointments found"
                 }
 
+                // Apply current filter to the loaded data
+                applyFilter()
+
                 // Update UI
-                appointmentAdapter.notifyDataSetChanged()
-                binding.emptyStateLayout.visibility = if (appointmentList.isEmpty()) View.VISIBLE else View.GONE
                 binding.progressBar.visibility = View.GONE
-                binding.swipeRefreshLayout.isRefreshing = false
             }
 
             override fun onCancelled(error: DatabaseError) {
                 Toast.makeText(this@BookingHistory, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
                 binding.progressBar.visibility = View.GONE
-                binding.swipeRefreshLayout.isRefreshing = false
                 Log.e("BookingHistory", "Database error: ${error.message}")
             }
         }
 
         // Add the listener for real-time updates
         userBookingsRef.addValueEventListener(userBookingsListener!!)
+    }
+
+    private fun hideAllEmptyStates() {
+        binding.emptyStateLayout.visibility = View.GONE
+        binding.emptyStateDeclinedLayout.visibility = View.GONE
+        binding.emptyStateApprovedLayout.visibility = View.GONE
     }
 
     // Auto-refresh timer
@@ -157,10 +245,8 @@ class BookingHistory : AppCompatActivity() {
         autoRefreshRunnable = object : Runnable {
             override fun run() {
                 Log.d("BookingHistory", "Auto-refresh triggered")
-                if (!binding.swipeRefreshLayout.isRefreshing) {
-                    // Instead of reloading everything, just check for connection status
-                    updateConnectionStatus()
-                }
+                // Instead of reloading everything, just check for connection status
+                updateConnectionStatus()
                 handler.postDelayed(this, AUTO_REFRESH_INTERVAL)
             }
         }
@@ -188,15 +274,9 @@ class BookingHistory : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Refresh data when activity resumes
         if (::userBookingsRef.isInitialized && userBookingsListener == null) {
             loadAppointments()
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
-
     }
 
     override fun onDestroy() {
@@ -239,8 +319,9 @@ class BookingHistory : AppCompatActivity() {
 
             val color = when (appointment.status.lowercase()) {
                 "confirmed" -> getColor(R.color.green)
-                "cancelled" -> getColor(R.color.red)
+                "declined", "cancelled" -> getColor(R.color.red)
                 "completed" -> getColor(R.color.blue)
+                "ongoing" -> getColor(R.color.green)
                 else -> getColor(R.color.orange)
             }
             holder.appointmentStatus.setTextColor(color)

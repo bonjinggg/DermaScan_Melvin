@@ -11,5 +11,9 @@ data class BookingData(
     var status: String = "pending", // pending, confirmed, declined, completed
     val timestampMillis: Long = 0L,
     val createdAt: Long = 0L,
-    var declineReason: String? = null
+    var declineReason: String? = null,
+    val timestamp: Long = 0L,
+    var cancellationReason: String? = null,
+    val completed: Boolean = false,
+    val cancelled: Boolean = false
 )

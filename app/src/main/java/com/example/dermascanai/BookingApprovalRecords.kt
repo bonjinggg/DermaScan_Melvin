@@ -45,30 +45,48 @@ class BookingApprovalRecords : AppCompatActivity() {
             finish()
         }
 
-        // Toggle between pending and all bookings
         binding.pendingFilterChip.setOnClickListener {
             binding.pendingFilterChip.isChecked = true
             binding.allFilterChip.isChecked = false
+            binding.approvedFilterChip.isChecked = false
+            binding.declinedFilterChip.isChecked = false
+            binding.ongoingFilterChip.isChecked = false
             loadPendingAppointments()
         }
 
-        // Toggle between pending and all bookings
         binding.approvedFilterChip.setOnClickListener {
             binding.approvedFilterChip.isChecked = true
             binding.allFilterChip.isChecked = false
+            binding.pendingFilterChip.isChecked = false
+            binding.declinedFilterChip.isChecked = false
+            binding.ongoingFilterChip.isChecked = false
             loadApprovedAppointments()
         }
 
-        // Toggle between pending and all bookings
         binding.declinedFilterChip.setOnClickListener {
             binding.declinedFilterChip.isChecked = true
             binding.allFilterChip.isChecked = false
+            binding.pendingFilterChip.isChecked = false
+            binding.approvedFilterChip.isChecked = false
+            binding.ongoingFilterChip.isChecked = false
             loadDeclineAppointments()
+        }
+
+        binding.ongoingFilterChip.setOnClickListener {
+            binding.ongoingFilterChip.isChecked = true
+            binding.allFilterChip.isChecked = false
+            binding.pendingFilterChip.isChecked = false
+            binding.approvedFilterChip.isChecked = false
+            binding.declinedFilterChip.isChecked = false
+            loadOngoingAppointments()
         }
 
         binding.allFilterChip.setOnClickListener {
             binding.allFilterChip.isChecked = true
             binding.pendingFilterChip.isChecked = false
+            binding.approvedFilterChip.isChecked = false
+            binding.declinedFilterChip.isChecked = false
+            binding.ongoingFilterChip.isChecked = false
             loadAllAppointments()
         }
     }
@@ -77,7 +95,8 @@ class BookingApprovalRecords : AppCompatActivity() {
         adapter = BookingApprovalAdapter(
             appointmentList,
             onApprove = { booking -> updateBookingStatus(booking, "confirmed") },
-            onDecline = { booking -> showDeclineReasonDialog(booking) }
+            onDecline = { booking -> showDeclineReasonDialog(booking) },
+            onCancel = { booking -> showCancellationReasonDialog(booking) } // New callback for cancellation
         )
         binding.bookingRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.bookingRecyclerView.adapter = adapter
@@ -197,6 +216,44 @@ class BookingApprovalRecords : AppCompatActivity() {
             })
     }
 
+    private fun loadOngoingAppointments() {
+        binding.progressBar.visibility = View.VISIBLE
+        appointmentList.clear()
+
+        val doctorBookingsRef = database.getReference("doctorBookings")
+            .child(doctorEmail.replace(".", ","))
+
+        doctorBookingsRef.orderByChild("status").equalTo("ongoing")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        for (bookingSnapshot in snapshot.children) {
+                            val booking = bookingSnapshot.getValue(BookingData::class.java)
+                            booking?.let {
+                                appointmentList.add(it)
+                            }
+                        }
+                        // Sort by appointment date/time
+                        appointmentList.sortBy { it.timestampMillis }
+                        adapter.notifyDataSetChanged()
+
+                        // Show empty state or content
+                        updateViewVisibility()
+                    } else {
+                        appointmentList.clear()
+                        adapter.notifyDataSetChanged()
+                        updateViewVisibility()
+                    }
+                    binding.progressBar.visibility = View.GONE
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(this@BookingApprovalRecords, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
+                    binding.progressBar.visibility = View.GONE
+                }
+            })
+    }
+
     private fun loadAllAppointments() {
         binding.progressBar.visibility = View.VISIBLE
         appointmentList.clear()
@@ -247,21 +304,28 @@ class BookingApprovalRecords : AppCompatActivity() {
     private fun updateBookingStatus(booking: BookingData, newStatus: String) {
         binding.progressBar.visibility = View.VISIBLE
 
+        // Check if approved appointment is for today, mark as ongoing
+        val finalStatus = if (newStatus == "confirmed" && isAppointmentForToday(booking)) {
+            "ongoing"
+        } else {
+            newStatus
+        }
+
         // Update status in all three locations
         val updates = HashMap<String, Any>()
 
         // Main bookings reference
-        updates["/bookings/${booking.bookingId}/status"] = newStatus
+        updates["/bookings/${booking.bookingId}/status"] = finalStatus
 
         // Doctor bookings reference
         updates["/doctorBookings/${booking.doctorEmail.replace(".", ",")}" +
-                "/${booking.bookingId}/status"] = newStatus
+                "/${booking.bookingId}/status"] = finalStatus
 
         // User bookings reference
         updates["/userBookings/${booking.patientEmail.replace(".", ",")}" +
-                "/${booking.bookingId}/status"] = newStatus
+                "/${booking.bookingId}/status"] = finalStatus
 
-        // Add note if it's a decline
+        // Add reason if it's a decline or cancellation
         if (booking.declineReason != null && booking.declineReason!!.isNotEmpty()) {
             updates["/bookings/${booking.bookingId}/declineReason"] = booking.declineReason!!
             updates["/doctorBookings/${booking.doctorEmail.replace(".", ",")}" +
@@ -270,27 +334,71 @@ class BookingApprovalRecords : AppCompatActivity() {
                     "/${booking.bookingId}/declineReason"] = booking.declineReason!!
         }
 
+        // Add cancellation reason if present
+        if (booking.cancellationReason != null && booking.cancellationReason!!.isNotEmpty()) {
+            updates["/bookings/${booking.bookingId}/cancellationReason"] = booking.cancellationReason!!
+            updates["/doctorBookings/${booking.doctorEmail.replace(".", ",")}" +
+                    "/${booking.bookingId}/cancellationReason"] = booking.cancellationReason!!
+            updates["/userBookings/${booking.patientEmail.replace(".", ",")}" +
+                    "/${booking.bookingId}/cancellationReason"] = booking.cancellationReason!!
+        }
+
         // Apply all updates atomically
         database.reference.updateChildren(updates)
             .addOnSuccessListener {
+                val statusMessage = when (finalStatus) {
+                    "confirmed" -> "approved"
+                    "ongoing" -> "approved and marked as ongoing"
+                    "cancelled" -> "cancelled"
+                    else -> "declined"
+                }
+
                 Toast.makeText(
                     this,
-                    "Appointment ${if (newStatus == "confirmed") "approved" else "declined"}",
+                    "Appointment $statusMessage",
                     Toast.LENGTH_SHORT
                 ).show()
 
-                // Refresh the list
-                if (binding.pendingFilterChip.isChecked) {
-                    loadPendingAppointments()
-                } else {
-                    loadAllAppointments()
-                }
+                // Refresh the list based on current filter
+                refreshCurrentView()
                 binding.progressBar.visibility = View.GONE
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                 binding.progressBar.visibility = View.GONE
             }
+    }
+
+    private fun isAppointmentForToday(booking: BookingData): Boolean {
+        // Get the date portion of the booking timestamp
+        val bookingCalendar = Calendar.getInstance().apply {
+            timeInMillis = booking.timestampMillis
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+
+        // Get today's date at midnight
+        val todayCalendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+
+        // Compare the dates
+        return bookingCalendar.timeInMillis == todayCalendar.timeInMillis
+    }
+
+    private fun refreshCurrentView() {
+        when {
+            binding.pendingFilterChip.isChecked -> loadPendingAppointments()
+            binding.approvedFilterChip.isChecked -> loadApprovedAppointments()
+            binding.declinedFilterChip.isChecked -> loadDeclineAppointments()
+            binding.ongoingFilterChip.isChecked -> loadOngoingAppointments()
+            else -> loadAllAppointments()
+        }
     }
 
     private fun showDeclineReasonDialog(booking: BookingData) {
@@ -310,6 +418,33 @@ class BookingApprovalRecords : AppCompatActivity() {
         }
 
         builder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.cancel()
+        }
+
+        builder.show()
+    }
+
+    // New function to show cancellation reason dialog
+    private fun showCancellationReasonDialog(booking: BookingData) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Cancel Appointment")
+        builder.setMessage("Please provide a reason for cancellation:")
+
+        val input = androidx.appcompat.widget.AppCompatEditText(this)
+        builder.setView(input)
+
+        builder.setPositiveButton("Cancel Appointment") { _, _ ->
+            val reason = input.text.toString().trim()
+            if (reason.isNotEmpty()) {
+                booking.cancellationReason = reason
+            } else {
+                Toast.makeText(this, "Please provide a cancellation reason", Toast.LENGTH_SHORT).show()
+                return@setPositiveButton
+            }
+            updateBookingStatus(booking, "cancelled")
+        }
+
+        builder.setNegativeButton("Back") { dialog, _ ->
             dialog.cancel()
         }
 

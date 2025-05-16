@@ -2,169 +2,326 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/bookingCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="4dp">
+    android:layout_margin="12dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="6dp">
 
+    <!-- Main Background with subtle gradient -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:background="@drawable/cardbackground">
 
-        <!-- Top row: Patient Name + Status -->
+        <!-- Status Bar -->
         <LinearLayout
+            android:id="@+id/statusLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/patientNameTv"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                tools:text="John Doe" />
-
-            <TextView
-                android:id="@+id/statusBadgeTv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/status_background"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="4dp"
-                android:textColor="@color/orange"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                tools:text="Pending" />
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginVertical="8dp"
-            android:background="#E0E0E0" />
-
-        <!-- Appointment Date -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:background="@drawable/statusbackground"
+            android:orientation="horizontal"
+            android:paddingVertical="10dp"
+            android:paddingHorizontal="16dp"
+            android:gravity="center_vertical"
+            android:visibility="gone">
 
             <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_calendar"
-                android:contentDescription="Calendar icon" />
+                android:id="@+id/statusIcon"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/circlebackground" />
 
             <TextView
-                android:id="@+id/appointmentDateTv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:textColor="@color/black"
-                tools:text="May 10, 2025" />
-        </LinearLayout>
-
-        <!-- Appointment Time -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/clock"
-                android:contentDescription="Clock icon" />
-
-            <TextView
-                android:id="@+id/appointmentTimeTv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:textColor="@color/black"
-                tools:text="10:00 AM" />
-        </LinearLayout>
-
-        <!-- Message -->
-        <TextView
-            android:id="@+id/patientMessageTv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textColor="#757575"
-            android:textSize="14sp"
-            tools:text="Message: I'm having a skin rash for 3 days" />
-
-        <!-- Decline Reason (Visible only for declined appointments) -->
-        <LinearLayout
-            android:id="@+id/declineReasonLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="vertical"
-            android:visibility="gone"
-            tools:visibility="visible">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Decline Reason:"
-                android:textColor="@android:color/holo_red_light"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/declineReasonTv"
+                android:id="@+id/statusTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textColor="#757575"
+                android:textColor="@android:color/white"
                 android:textSize="14sp"
-                tools:text="Doctor is not available on this date." />
+                android:textStyle="bold"
+                tools:text="Approved" />
         </LinearLayout>
 
-        <!-- Approve / Decline Buttons -->
+        <!-- Content Container -->
         <LinearLayout
-            android:id="@+id/actionButtonsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:gravity="end"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:padding="20dp">
 
-            <Button
-                android:id="@+id/approveButton"
-                android:layout_width="wrap_content"
+            <!-- Header with Patient Info -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Approve"
-                android:backgroundTint="@android:color/holo_green_light" />
+                android:orientation="vertical"
+                android:layout_marginBottom="16dp">
 
-            <Button
-                android:id="@+id/declineButton"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="PATIENT"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="12sp"
+                    android:letterSpacing="0.1"
+                    android:fontFamily="sans-serif-medium" />
+
+                <TextView
+                    android:id="@+id/patientNameTv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif"
+                    android:layout_marginTop="4dp"
+                    tools:text="John Doe" />
+            </LinearLayout>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/dividerColor"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Date and Time in a card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:text="Decline"
-                android:backgroundTint="@android:color/holo_red_light" />
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/lightBackground">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_calendar"
+                                android:layout_marginEnd="8dp"
+                                />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="DATE"
+                                android:textColor="@color/textSecondary"
+                                android:textSize="12sp"
+                                android:fontFamily="sans-serif-medium" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/appointmentDateTv"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/textPrimary"
+                            android:textSize="16sp"
+                            android:fontFamily="sans-serif"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginStart="24dp"
+                            tools:text="Mon, May 1, 2023" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@color/dividerColor" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="16dp">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/clock"
+                                android:layout_marginEnd="8dp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="TIME"
+                                android:textColor="@color/textSecondary"
+                                android:textSize="12sp"
+                                android:fontFamily="sans-serif-medium" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/appointmentTimeTv"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/textPrimary"
+                            android:textSize="16sp"
+                            android:fontFamily="sans-serif"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginStart="24dp"
+                            tools:text="3:30 PM" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/noteBackground">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="NOTES"
+                        android:textColor="@color/textSecondary"
+                        android:textSize="12sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/notesTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="4dp"
+                        android:fontFamily="sans-serif"
+                        tools:text="Patient notes and additional information about the appointment. May include special instructions or requirements." />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Decline Reason (only visible if declined) -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/declineReasonLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/errorBackground"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="12dp"
+                        android:layout_gravity="center_vertical" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="REASON FOR DECLINING"
+                            android:textColor="@color/errorColor"
+                            android:textSize="12sp"
+                            android:fontFamily="sans-serif-medium"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:id="@+id/declineReasonTv"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/errorTextColor"
+                            android:textSize="14sp"
+                            android:fontFamily="sans-serif"
+                            tools:text="Doctor is not available at this time due to scheduling conflict." />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Action Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/approveButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/colorPrimary"
+                    android:text="Approve"
+                    android:textColor="@android:color/white"
+                    android:paddingVertical="12dp"
+                    app:cornerRadius="12dp"
+                    app:icon="@drawable/checkicon"
+                    app:iconGravity="textStart" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/declineButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@android:color/white"
+                    android:text="Decline"
+                    android:textColor="@color/errorColor"
+                    android:paddingVertical="12dp"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="@color/errorColor"
+                    app:strokeWidth="1dp"
+                    app:icon="@drawable/ic_close"
+                    app:iconTint="@color/errorColor"
+                    app:iconGravity="textStart" />
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cancelButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/errorColor"
+                android:text="Cancel Appointment"
+                android:textColor="@android:color/white"
+                android:paddingVertical="12dp"
+                app:cornerRadius="12dp"
+                app:icon="@drawable/cancelicon"
+                app:iconGravity="textStart"
+                android:visibility="gone" />
         </LinearLayout>
-
-        <!-- Patient Image (Hidden) -->
-        <ImageView
-            android:id="@+id/patientImageView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone"
-            tools:ignore="ContentDescription" />
-
     </LinearLayout>
-
 </androidx.cardview.widget.CardView>

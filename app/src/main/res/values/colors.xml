@@ -43,6 +43,25 @@
         <color name="confirmed_stroke">#FFA5D6A7</color>
         <color name="declined_stroke">#FFEF9A9A</color>
         <color name="completed_stroke">#FFBBDEFB</color>
+    <color name="colorPrimary">#4285F4</color>
+    <color name="colorPrimaryDark">#3367D6</color>
+    <color name="colorAccent">#4285F4</color>
+    <color name="textPrimary">#202124</color>
+    <color name="textSecondary">#5F6368</color>
+    <color name="lightBackground">#F8F9FA</color>
+    <color name="noteBackground">#F1F3F4</color>
+    <color name="dividerColor">#DADCE0</color>
+    <color name="errorColor">#D93025</color>
+    <color name="errorBackground">#FDEEEE</color>
+    <color name="errorTextColor">#B31412</color>
+    <color name="statusApproved">#0F9D58</color>
+    <color name="statusApprovedBg">#E6F4EA</color>
+    <color name="statusPending">#F4B400</color>
+    <color name="statusPendingBg">#FEF7E0</color>
+    <color name="statusDeclined">#D93025</color>
+    <color name="statusDeclinedBg">#FDEEEE</color>
+    <color name="statusCancelled">#5F6368</color>
+    <color name="statusCancelledBg">#F1F3F4</color>
 
 
 
