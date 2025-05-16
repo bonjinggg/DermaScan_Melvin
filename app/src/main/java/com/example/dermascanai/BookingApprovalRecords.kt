@@ -30,7 +30,6 @@ class BookingApprovalRecords : AppCompatActivity() {
         database = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
         auth = FirebaseAuth.getInstance()
 
-        // Get current doctor's email
         doctorEmail = auth.currentUser?.email ?: ""
         if (doctorEmail.isEmpty()) {
             Toast.makeText(this, "Error: User not logged in", Toast.LENGTH_SHORT).show()
@@ -51,6 +50,7 @@ class BookingApprovalRecords : AppCompatActivity() {
             binding.approvedFilterChip.isChecked = false
             binding.declinedFilterChip.isChecked = false
             binding.ongoingFilterChip.isChecked = false
+            binding.cancelledFilterChip.isChecked = false
             loadPendingAppointments()
         }
 
@@ -60,6 +60,7 @@ class BookingApprovalRecords : AppCompatActivity() {
             binding.pendingFilterChip.isChecked = false
             binding.declinedFilterChip.isChecked = false
             binding.ongoingFilterChip.isChecked = false
+            binding.cancelledFilterChip.isChecked = false
             loadApprovedAppointments()
         }
 
@@ -69,7 +70,18 @@ class BookingApprovalRecords : AppCompatActivity() {
             binding.pendingFilterChip.isChecked = false
             binding.approvedFilterChip.isChecked = false
             binding.ongoingFilterChip.isChecked = false
+            binding.cancelledFilterChip.isChecked = false
             loadDeclineAppointments()
+        }
+
+        binding.cancelledFilterChip.setOnClickListener {
+            binding.cancelledFilterChip.isChecked = true
+            binding.allFilterChip.isChecked = false
+            binding.pendingFilterChip.isChecked = false
+            binding.approvedFilterChip.isChecked = false
+            binding.declinedFilterChip.isChecked = false
+            binding.ongoingFilterChip.isChecked = false
+            loadCancelledAppointments()
         }
 
         binding.ongoingFilterChip.setOnClickListener {
@@ -78,6 +90,7 @@ class BookingApprovalRecords : AppCompatActivity() {
             binding.pendingFilterChip.isChecked = false
             binding.approvedFilterChip.isChecked = false
             binding.declinedFilterChip.isChecked = false
+            binding.cancelledFilterChip.isChecked = false
             loadOngoingAppointments()
         }
 
@@ -87,6 +100,7 @@ class BookingApprovalRecords : AppCompatActivity() {
             binding.approvedFilterChip.isChecked = false
             binding.declinedFilterChip.isChecked = false
             binding.ongoingFilterChip.isChecked = false
+            binding.cancelledFilterChip.isChecked = false
             loadAllAppointments()
         }
     }
@@ -96,7 +110,7 @@ class BookingApprovalRecords : AppCompatActivity() {
             appointmentList,
             onApprove = { booking -> updateBookingStatus(booking, "confirmed") },
             onDecline = { booking -> showDeclineReasonDialog(booking) },
-            onCancel = { booking -> showCancellationReasonDialog(booking) } // New callback for cancellation
+            onCancel = { booking -> showCancellationReasonDialog(booking) }
         )
         binding.bookingRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.bookingRecyclerView.adapter = adapter
@@ -119,8 +133,8 @@ class BookingApprovalRecords : AppCompatActivity() {
                                 appointmentList.add(it)
                             }
                         }
-                        // Sort by appointment date/time
-                        appointmentList.sortBy { it.timestampMillis }
+                        // Sort by appointment date/time (descending order - newest first)
+                        appointmentList.sortByDescending { it.timestampMillis }
                         adapter.notifyDataSetChanged()
 
                         // Show empty state or content
@@ -157,8 +171,8 @@ class BookingApprovalRecords : AppCompatActivity() {
                                 appointmentList.add(it)
                             }
                         }
-                        // Sort by appointment date/time
-                        appointmentList.sortBy { it.timestampMillis }
+                        // Sort by appointment date/time (descending order - newest first)
+                        appointmentList.sortByDescending { it.timestampMillis }
                         adapter.notifyDataSetChanged()
 
                         // Show empty state or content
@@ -195,8 +209,47 @@ class BookingApprovalRecords : AppCompatActivity() {
                                 appointmentList.add(it)
                             }
                         }
-                        // Sort by appointment date/time
-                        appointmentList.sortBy { it.timestampMillis }
+                        // Sort by appointment date/time (descending order - newest first)
+                        appointmentList.sortByDescending { it.timestampMillis }
+                        adapter.notifyDataSetChanged()
+
+                        // Show empty state or content
+                        updateViewVisibility()
+                    } else {
+                        appointmentList.clear()
+                        adapter.notifyDataSetChanged()
+                        updateViewVisibility()
+                    }
+                    binding.progressBar.visibility = View.GONE
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(this@BookingApprovalRecords, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
+                    binding.progressBar.visibility = View.GONE
+                }
+            })
+    }
+
+
+    private fun loadCancelledAppointments() {
+        binding.progressBar.visibility = View.VISIBLE
+        appointmentList.clear()
+
+        val doctorBookingsRef = database.getReference("doctorBookings")
+            .child(doctorEmail.replace(".", ","))
+
+        doctorBookingsRef.orderByChild("status").equalTo("cancelled")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        for (bookingSnapshot in snapshot.children) {
+                            val booking = bookingSnapshot.getValue(BookingData::class.java)
+                            booking?.let {
+                                appointmentList.add(it)
+                            }
+                        }
+                        // Sort by appointment date/time (descending order - newest first)
+                        appointmentList.sortByDescending { it.timestampMillis }
                         adapter.notifyDataSetChanged()
 
                         // Show empty state or content
@@ -233,8 +286,8 @@ class BookingApprovalRecords : AppCompatActivity() {
                                 appointmentList.add(it)
                             }
                         }
-                        // Sort by appointment date/time
-                        appointmentList.sortBy { it.timestampMillis }
+                        // Sort by appointment date/time (descending order - newest first)
+                        appointmentList.sortByDescending { it.timestampMillis }
                         adapter.notifyDataSetChanged()
 
                         // Show empty state or content
@@ -270,8 +323,8 @@ class BookingApprovalRecords : AppCompatActivity() {
                             appointmentList.add(it)
                         }
                     }
-                    // Sort by appointment date/time
-                    appointmentList.sortBy { it.timestampMillis }
+                    // Sort by appointment date/time (descending order - newest first)
+                    appointmentList.sortByDescending { it.timestampMillis }
                     adapter.notifyDataSetChanged()
 
                     // Show empty state or content
@@ -291,12 +344,48 @@ class BookingApprovalRecords : AppCompatActivity() {
         })
     }
 
+    // Also update the updateViewVisibility() function to handle the cancelled empty state
     private fun updateViewVisibility() {
         if (appointmentList.isEmpty()) {
-            binding.emptyStateLayout.visibility = View.VISIBLE
+            // Show appropriate empty state based on selected filter
+            when {
+                binding.pendingFilterChip.isChecked -> {
+                    binding.emptyStateLayout.visibility = View.VISIBLE
+                    binding.emptyStateDeclinedLayout.visibility = View.GONE
+                    binding.emptyStateApprovedLayout.visibility = View.GONE
+                    binding.emptyStateCancelledLayout.visibility = View.GONE
+                }
+                binding.declinedFilterChip.isChecked -> {
+                    binding.emptyStateLayout.visibility = View.GONE
+                    binding.emptyStateDeclinedLayout.visibility = View.VISIBLE
+                    binding.emptyStateApprovedLayout.visibility = View.GONE
+                    binding.emptyStateCancelledLayout.visibility = View.GONE
+                }
+                binding.approvedFilterChip.isChecked -> {
+                    binding.emptyStateLayout.visibility = View.GONE
+                    binding.emptyStateDeclinedLayout.visibility = View.GONE
+                    binding.emptyStateApprovedLayout.visibility = View.VISIBLE
+                    binding.emptyStateCancelledLayout.visibility = View.GONE
+                }
+                binding.cancelledFilterChip.isChecked -> {
+                    binding.emptyStateLayout.visibility = View.GONE
+                    binding.emptyStateDeclinedLayout.visibility = View.GONE
+                    binding.emptyStateApprovedLayout.visibility = View.GONE
+                    binding.emptyStateCancelledLayout.visibility = View.VISIBLE
+                }
+                else -> {
+                    binding.emptyStateLayout.visibility = View.VISIBLE
+                    binding.emptyStateDeclinedLayout.visibility = View.GONE
+                    binding.emptyStateApprovedLayout.visibility = View.GONE
+                    binding.emptyStateCancelledLayout.visibility = View.GONE
+                }
+            }
             binding.bookingRecyclerView.visibility = View.GONE
         } else {
             binding.emptyStateLayout.visibility = View.GONE
+            binding.emptyStateDeclinedLayout.visibility = View.GONE
+            binding.emptyStateApprovedLayout.visibility = View.GONE
+            binding.emptyStateCancelledLayout.visibility = View.GONE
             binding.bookingRecyclerView.visibility = View.VISIBLE
         }
     }
@@ -397,6 +486,7 @@ class BookingApprovalRecords : AppCompatActivity() {
             binding.approvedFilterChip.isChecked -> loadApprovedAppointments()
             binding.declinedFilterChip.isChecked -> loadDeclineAppointments()
             binding.ongoingFilterChip.isChecked -> loadOngoingAppointments()
+            binding.cancelledFilterChip.isChecked -> loadCancelledAppointments()
             else -> loadAllAppointments()
         }
     }
@@ -424,7 +514,6 @@ class BookingApprovalRecords : AppCompatActivity() {
         builder.show()
     }
 
-    // New function to show cancellation reason dialog
     private fun showCancellationReasonDialog(booking: BookingData) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Cancel Appointment")

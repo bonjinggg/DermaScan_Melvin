@@ -40,6 +40,7 @@ class ConfirmBooking : AppCompatActivity() {
     private var selectedTime: String = ""
     private var doctorEmail: String = ""
     private var patientEmail: String = ""
+    private var name: String = ""
     private var timestampMillis: Long = 0L
     private var doctorName: String = ""
 
@@ -62,14 +63,12 @@ class ConfirmBooking : AppCompatActivity() {
 
         // Get current user email and set patient email
         val currentUserEmail = auth.currentUser?.email
-        // First check if patientEmail is passed from intent, otherwise use current user's email
         patientEmail = intent.getStringExtra("patientEmail") ?: ""
         if (patientEmail.isEmpty()) {
             patientEmail = currentUserEmail ?: ""
             Log.d("ConfirmBooking", "Using current user email: $patientEmail")
         }
 
-        // Display patient email in UI if you have a field for it
         binding.messageEditText.hint = "Message from $patientEmail"
 
         if (doctorEmail.isEmpty()) {

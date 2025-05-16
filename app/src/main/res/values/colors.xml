@@ -62,8 +62,14 @@
     <color name="statusDeclinedBg">#FDEEEE</color>
     <color name="statusCancelled">#5F6368</color>
     <color name="statusCancelledBg">#F1F3F4</color>
-
-
+    <color name="cancelBackground">#FFF8E1</color>
+    <color name="cancelColor">#FF9800</color>
+    <color name="cancelTextColor">#F57C00</color>
+    <color name="status_pending">#FFAB00</color>
+    <color name="status_confirmed">#00C853</color>
+    <color name="status_declined">#D50000</color>
+    <color name="status_cancelled">#FF6D00</color>
+    <color name="status_ongoing">#2962FF</color>
 
 
 </resources>
