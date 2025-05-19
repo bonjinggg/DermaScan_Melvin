@@ -12,6 +12,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
 class DermaDetails : AppCompatActivity() {
+
     private lateinit var binding: ActivityDermaDetailsBinding
     private lateinit var database: FirebaseDatabase
     private lateinit var mAuth: FirebaseAuth
@@ -36,8 +37,6 @@ class DermaDetails : AppCompatActivity() {
             finish()
         }
 
-
-
         fetchUserData(userEmail)
 
         binding.appointmentBtn.setOnClickListener {
@@ -56,43 +55,53 @@ class DermaDetails : AppCompatActivity() {
                 if (snapshot.exists()) {
                     for (childSnapshot in snapshot.children) {
                         val dermaInfo = childSnapshot.getValue(DermaInfo::class.java)
-                        val address = "${dermaInfo?.barangay}, ${dermaInfo?.city}, ${dermaInfo?.province}"
                         if (dermaInfo != null) {
-                            binding.textView19.text = dermaInfo.name
-                            binding.textView28.text = address
-                            binding.bio.text = dermaInfo.bio
 
-                            if (dermaInfo.status.equals("verified", ignoreCase = true)) {
-                                binding.textView20.visibility = View.VISIBLE
-                                binding.phone.visibility = View.VISIBLE
-                                binding.fbAccnt.visibility = View.VISIBLE
-                                binding.imageView4.visibility = View.VISIBLE
-                                binding.gmail.visibility = View.VISIBLE
-                                binding.rateMe.visibility = View.VISIBLE
-                                binding.appointmentBtn.visibility = View.VISIBLE
-                                binding.textView28.visibility = View.VISIBLE
-                                binding.text.visibility = View.GONE
-                            } else {
-                                binding.textView20.visibility = View.GONE
-                                binding.phone.visibility = View.GONE
-                                binding.fbAccnt.visibility = View.GONE
-                                binding.imageView4.visibility = View.GONE
-                                binding.gmail.visibility = View.GONE
-                                binding.rateMe.visibility = View.GONE
-                                binding.appointmentBtn.visibility = View.GONE
-                                binding.textView28.visibility = View.VISIBLE
-                                binding.text.visibility = View.VISIBLE
-                            }
+                            // Full name, bio
+                            binding.textView19.text = dermaInfo.name ?: ""
+                            binding.bio.text = dermaInfo.bio ?: ""
 
-                            dermaInfo.profileImage?.let {
-                                if (it.isNotEmpty()) {
-                                    try {
-                                        val decodedBytes = Base64.decode(it, Base64.DEFAULT)
-                                        val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
-                                        binding.profile.setImageBitmap(bitmap)
-                                    } catch (e: Exception) {
-                                        e.printStackTrace()
-                                    }
+                            // Clinic full address (concatenated with clinicAddress, barangay, city, province)
+                            val fullAddress = listOfNotNull(
+                                dermaInfo.clinicAddress,
+                                dermaInfo.barangay,
+                                dermaInfo.city,
+                                dermaInfo.province
+                            ).joinToString(", ")
+                            binding.textView28.text = if (fullAddress.isNotBlank()) fullAddress else "Not available"
+
+                            // Contact info
+                            binding.phone.text = dermaInfo.contact ?: "Not available"
+                            binding.gmail.text = dermaInfo.email ?: "Not available"
+
+                            // Schedule
+                            val clinicDays = if (!dermaInfo.clinicOpenDay.isNullOrBlank() && !dermaInfo.clinicCloseDay.isNullOrBlank())
+                                "${dermaInfo.clinicOpenDay} to ${dermaInfo.clinicCloseDay}" else "Not specified"
+                            val clinicTimes = if (!dermaInfo.clinicOpenTime.isNullOrBlank() && !dermaInfo.clinicCloseTime.isNullOrBlank())
+                                "${dermaInfo.clinicOpenTime} to ${dermaInfo.clinicCloseTime}" else "Not specified"
+
+                            binding.clinicDaysText.text = clinicDays
+                            binding.clinicTimeText.text = clinicTimes
+
+                            // Show/hide based on verification
+                            val isVerified = dermaInfo.status.equals("verified", ignoreCase = true)
+                            val visibleViews = listOf(
+                                binding.textView20, binding.phone, binding.gmail,
+                                binding.imageView4, binding.rateMe, binding.appointmentBtn, binding.textView28
+                            )
+                            val goneViews = listOf(binding.text)
+
+                            visibleViews.forEach { it.visibility = if (isVerified) View.VISIBLE else View.GONE }
+                            goneViews.forEach { it.visibility = if (isVerified) View.GONE else View.VISIBLE }
+
+                            // Profile image
+                            dermaInfo.profileImage?.takeIf { it.isNotBlank() }?.let {
+                                try {
+                                    val decodedBytes = Base64.decode(it, Base64.DEFAULT)
+                                    val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+                                    binding.profile.setImageBitmap(bitmap)
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
                                 }
                             }
                         }

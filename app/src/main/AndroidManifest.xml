@@ -75,6 +75,10 @@
             android:name=".TermsConditions"
             android:exported="false" />
         <activity
+            android:name=".DermaRegister2"
+            android:exported="false" />
+
+        <activity
             android:name=".PersonalInfo"
             android:exported="false"
             android:screenOrientation="portrait" />

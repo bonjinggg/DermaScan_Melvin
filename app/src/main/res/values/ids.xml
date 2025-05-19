@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="cardViewProfile" type="id" />
+    <item name="clinicOpenTimeText" type="id" />
+    <item name="imageViewCalendar" type="id" />
+    <item name="clinicOpenDayText" type="id" />
+    <item name="cardViewBio" type="id" />
+    <item name="clinicCloseTimeText" type="id" />
+    <item name="imageViewCloseTime" type="id" />
+    <item name="imageViewCloseDay" type="id" />
+    <item name="imageViewOpenTime" type="id" />
+    <item name="clinicCloseDayText" type="id" />
+    <item name="imageViewOpenDay" type="id" />
+    <item name="labelClinicOpen" type="id" />
+    <item name="gmail" type="id" />
+    <item name="textView32" type="id" />
+    <item name="fbAccnt" type="id" />
+    <item name="textView30" type="id" />
+    <item name="textView29" type="id" />
+    <item name="textView27" type="id" />
+    <item name="textView28" type="id" />
+    <item name="textView26" type="id" />
+    <item name="textView24" type="id" />
+    <item name="textView25" type="id" />
+    <item name="clinicTimeText" type="id" />
+    <item name="imageViewClinicTime" type="id" />
+    <item name="labelClinicTimes" type="id" />
+    <item name="clinicDaysText" type="id" />
+    <item name="imageViewClinicDays" type="id" />
+    <item name="weight" type="id" />
+    <item name="height" type="id" />
+    <item name="uploadLabel" type="id" />
+    <item name="logoCard" type="id" />
+</resources>

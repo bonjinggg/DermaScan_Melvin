@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dermascanai.databinding.ItemDermaListBinding
 
-
 class AdapterDermaHomeList(private val userList: List<DermaInfo>) :
     RecyclerView.Adapter<AdapterDermaHomeList.DermaUserViewHolder>() {
 
@@ -23,11 +22,12 @@ class AdapterDermaHomeList(private val userList: List<DermaInfo>) :
     override fun onBindViewHolder(holder: DermaUserViewHolder, position: Int) {
         val user = userList[position]
         with(holder.binding) {
-            name.text = user.name
+            name.text = user.name ?: "No Name"
 
-            if (!user.profileImage.isNullOrEmpty()) {
+            val profileImageString = user.profileImage
+            if (!profileImageString.isNullOrEmpty()) {
                 try {
-                    val decodedBytes = Base64.decode(user.profileImage, Base64.DEFAULT)
+                    val decodedBytes = Base64.decode(profileImageString, Base64.DEFAULT)
                     val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
                     profPic.setImageBitmap(bitmap)
                 } catch (e: Exception) {

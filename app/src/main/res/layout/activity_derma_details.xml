@@ -1,327 +1,351 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:padding="16dp"
     tools:context=".DermaDetails">
 
+    <!-- Back Button -->
     <ImageView
         android:id="@+id/backBTN"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:src="@drawable/back_arrow"
-        android:layout_margin="10dp"
+        android:contentDescription="@string/back"
         android:clickable="true"
-
+        android:focusable="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Profile Picture Card -->
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView6"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="50dp"
-        android:layout_marginStart="15dp"
-        app:cardCornerRadius="50dp"
+        android:id="@+id/cardViewProfile"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        app:cardCornerRadius="36dp"
+        app:cardElevation="8dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/backBTN"
+        android:layout_marginTop="16dp">
 
         <ImageView
             android:id="@+id/profile"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:scaleType="centerCrop"
             android:src="@drawable/default_profile" />
     </androidx.cardview.widget.CardView>
 
+    <!-- Name -->
     <TextView
         android:id="@+id/textView19"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Full Name"
+        android:text="Clinic Name"
         android:textColor="@color/black"
-        android:textSize="18sp"
-        android:layout_marginStart="5dp"
+        android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/textView7"
-        app:layout_constraintStart_toEndOf="@+id/cardView6" />
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintStart_toEndOf="@id/cardViewProfile"
+        app:layout_constraintEnd_toStartOf="@id/rateMe"
+        app:layout_constraintTop_toTopOf="@id/cardViewProfile"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp" />
 
+    <!-- Role -->
     <TextView
         android:id="@+id/textView7"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Dermatologist"
+        android:text="Clinic"
         android:textColor="@color/darkgrey"
-        android:layout_marginStart="5dp"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="@+id/cardView6"
-        app:layout_constraintStart_toEndOf="@+id/cardView6" />
+        android:textSize="14sp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintStart_toStartOf="@id/textView19"
+        app:layout_constraintTop_toBottomOf="@id/textView19"
+        app:layout_constraintEnd_toEndOf="@id/textView19"
+        android:layout_marginTop="4dp" />
 
+    <!-- Rate Me Button -->
     <Button
         android:id="@+id/rateMe"
+        style="?attr/materialButtonOutlinedStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Rate Me"
-        android:textSize="12sp"
-        android:layout_marginEnd="15dp"
-        app:layout_constraintBottom_toBottomOf="@+id/cardView6"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/cardView6" />
+        app:layout_constraintTop_toTopOf="@id/textView19"
+        app:layout_constraintBottom_toBottomOf="@id/textView7"
+        android:minWidth="80dp"
+        android:paddingHorizontal="12dp" />
+
+    <!-- Rating & Star -->
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="24dp"
+        android:src="@drawable/ic_star"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardViewProfile" />
 
     <TextView
         android:id="@+id/textView20"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="5dp"
         android:text="4.5"
         android:textColor="@color/black"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/textView21"
-        app:layout_constraintEnd_toStartOf="@+id/imageView4"
-        app:layout_constraintTop_toTopOf="@+id/textView21" />
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@id/imageView4"
+        app:layout_constraintBottom_toBottomOf="@id/imageView4"
+        app:layout_constraintTop_toTopOf="@id/imageView4" />
 
-    <ImageView
-        android:id="@+id/imageView4"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginEnd="15dp"
-        android:src="@drawable/ic_star"
-        app:layout_constraintBottom_toBottomOf="@+id/textView20"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textView20" />
-
+    <!-- Clinic Days -->
     <TextView
-        android:id="@+id/textView21"
+        android:id="@+id/labelClinicDays"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:textColor="@color/black"
-        android:text="9:00am - 5:00pm"
-        android:textSize="16sp"
-        android:layout_marginStart="10dp"
-        app:layout_constraintStart_toEndOf="@+id/imageView5"
-        app:layout_constraintTop_toBottomOf="@+id/cardView6" />
-
-    <ImageView
-        android:id="@+id/imageView5"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:layout_marginStart="15dp"
-        android:src="@drawable/ic_clock"
-        app:layout_constraintBottom_toBottomOf="@+id/textView21"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textView21" />
-
-    <ImageView
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:src="@drawable/calendar"
-        app:layout_constraintBottom_toBottomOf="@+id/textView23"
-        app:layout_constraintStart_toStartOf="@+id/imageView5"
-        app:layout_constraintTop_toTopOf="@+id/textView23" />
-
-    <TextView
-        android:id="@+id/textView23"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="Mon - Fri"
+        android:text="Clinic Open Days:"
         android:textColor="@color/black"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@+id/textView21"
-        app:layout_constraintTop_toBottomOf="@+id/textView21" />
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imageView4" />
+
+    <ImageView
+        android:id="@+id/imageViewClinicDays"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_calendar"
+        app:layout_constraintStart_toEndOf="@id/labelClinicDays"
+        app:layout_constraintTop_toTopOf="@id/labelClinicDays" />
+
+    <TextView
+        android:id="@+id/clinicDaysText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Mon, Wed, Fri to Tue, Thu"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@id/imageViewClinicDays"
+        app:layout_constraintTop_toTopOf="@id/labelClinicDays"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Clinic Times -->
+    <TextView
+        android:id="@+id/labelClinicTimes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Clinic Open Time:"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/clinicDaysText" />
+
+    <ImageView
+        android:id="@+id/imageViewClinicTime"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_clock"
+        app:layout_constraintStart_toEndOf="@id/labelClinicTimes"
+        app:layout_constraintTop_toTopOf="@id/labelClinicTimes" />
+
+    <TextView
+        android:id="@+id/clinicTimeText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="9:00 AM to 12:00 PM"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@id/imageViewClinicTime"
+        app:layout_constraintTop_toTopOf="@id/labelClinicTimes"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Specialty Type -->
+    <TextView
+        android:id="@+id/textView25"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Type:"
+        android:textColor="@color/darkgrey"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/clinicTimeText" />
 
     <TextView
         android:id="@+id/textView24"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="15dp"
         android:text="Cosmetic"
         android:textColor="@color/black"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/textView23"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textView23" />
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toEndOf="@id/textView25"
+        app:layout_constraintTop_toTopOf="@id/textView25" />
 
-    <TextView
-        android:id="@+id/textView25"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="5dp"
-        android:text="Type:"
-        android:textColor="@color/darkgrey"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@+id/textView24"
-        app:layout_constraintEnd_toStartOf="@+id/textView24"
-        app:layout_constraintTop_toTopOf="@+id/textView24" />
-
+    <!-- Bio Card -->
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView7"
-        android:layout_width="match_parent"
+        android:id="@+id/cardViewBio"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:elevation="8dp"
-
-        android:padding="15dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
         app:cardBackgroundColor="@color/white"
-        app:cardCornerRadius="25dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
+        app:layout_constraintTop_toBottomOf="@id/textView25"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView23">
-
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="16dp">
 
         <TextView
             android:id="@+id/bio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="15dp"
-            android:hint="Content here"
+            android:text="Content here"
             android:textColor="@color/black"
             android:textSize="16sp" />
-
     </androidx.cardview.widget.CardView>
 
+    <!-- Clinic Label -->
     <TextView
         android:id="@+id/textView26"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="25dp"
         android:text="Clinic:"
         android:textStyle="bold"
         android:textColor="@color/black"
         android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView7" />
+        app:layout_constraintTop_toBottomOf="@id/cardViewBio"
+        app:layout_constraintStart_toStartOf="parent" />
 
+    <!-- Clinic Address -->
     <TextView
         android:id="@+id/textView28"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Tagum City"
         android:textSize="16sp"
         android:textColor="@color/black"
-        app:layout_constraintStart_toStartOf="@+id/textView26"
-        app:layout_constraintTop_toBottomOf="@+id/textView26" />
+        android:layout_marginTop="4dp"
+        app:layout_constraintTop_toBottomOf="@id/textView26"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Contact Label -->
     <TextView
         android:id="@+id/textView27"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="25dp"
         android:text="Contact:"
-        android:textSize="16sp"
         android:textStyle="bold"
+        android:textSize="16sp"
         android:textColor="@color/black"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView28" />
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/textView28"
+        app:layout_constraintStart_toStartOf="parent" />
 
+    <!-- Phone Label -->
     <TextView
         android:id="@+id/textView29"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
         android:text="Mobile:"
         android:textSize="16sp"
         android:textColor="@color/black"
-        app:layout_constraintStart_toStartOf="@+id/textView27"
-        app:layout_constraintTop_toBottomOf="@+id/textView27" />
+        app:layout_constraintTop_toBottomOf="@id/textView27"
+        app:layout_constraintStart_toStartOf="parent" />
 
+    <!-- Phone Number -->
     <TextView
         android:id="@+id/phone"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
         android:text="09123456789"
         android:textColor="@color/black"
         android:textSize="16sp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@id/textView29"
+        app:layout_constraintTop_toTopOf="@id/textView29"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        app:layout_constraintBottom_toBottomOf="@+id/textView29"
-        app:layout_constraintStart_toEndOf="@+id/textView29"
-        app:layout_constraintTop_toTopOf="@+id/textView29" />
 
-
-    <TextView
-        android:id="@+id/textView30"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="Facebook:"
-        android:textSize="16sp"
-        android:textColor="@color/black"
-        app:layout_constraintStart_toStartOf="@+id/textView29"
-        app:layout_constraintTop_toBottomOf="@+id/textView29" />
-
-    <TextView
-        android:id="@+id/fbAccnt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="FB Name/email"
-        android:textColor="@color/black"
-        android:textSize="16sp"
-
-        android:layout_marginStart="5dp"
-        app:layout_constraintBottom_toBottomOf="@+id/textView30"
-        app:layout_constraintStart_toEndOf="@+id/textView30"
-        app:layout_constraintTop_toTopOf="@+id/textView30" />
-
+    <!-- Gmail Label -->
     <TextView
         android:id="@+id/textView32"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
         android:text="GMail:"
         android:textSize="16sp"
         android:textColor="@color/black"
-        app:layout_constraintStart_toStartOf="@+id/textView30"
-        app:layout_constraintTop_toBottomOf="@+id/textView30" />
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/phone"
+        app:layout_constraintStart_toStartOf="parent" />
 
+    <!-- Gmail Account -->
     <TextView
         android:id="@+id/gmail"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="derma@gmail.com"
         android:textColor="@color/black"
         android:textSize="16sp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@id/textView32"
+        app:layout_constraintTop_toTopOf="@id/textView32"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        android:layout_marginStart="5dp"
-        app:layout_constraintBottom_toBottomOf="@+id/textView32"
-        app:layout_constraintStart_toEndOf="@+id/textView32"
-        app:layout_constraintTop_toTopOf="@+id/textView32" />
-
+    <!-- Appointment Button -->
     <Button
         android:id="@+id/appointmentBtn"
-        android:layout_width="200dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Make an Appointment"
-        android:layout_marginBottom="25dp"
-        android:layout_marginTop="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="16dp"
+        android:textAllCaps="false"
+        android:backgroundTint="?attr/colorPrimary"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/gmail"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Not Verified Text -->
     <TextView
         android:id="@+id/text"
-        android:layout_width="200dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Not Verified Yet"
         android:textColor="@color/grey"
         android:textStyle="bold"
         android:gravity="center"
-        android:layout_marginBottom="25dp"
-        android:layout_marginTop="10dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/gmail"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="16dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

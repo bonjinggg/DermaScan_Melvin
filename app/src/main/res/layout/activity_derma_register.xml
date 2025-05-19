@@ -1,218 +1,534 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white2"
-    android:foregroundTint="#000000"
     tools:context=".DermaRegister">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/backBTN"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="15dp"
-        android:background="@drawable/back_arrow"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Register as Derma"
-        android:textColor="@color/black"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardView2"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginStart="25dp"
-        android:layout_marginTop="15dp"
-        android:elevation="8dp"
-        app:cardCornerRadius="50dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2">
-
-        <ImageView
-            android:id="@+id/profPic"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/ic_profile" />
-
-    </androidx.cardview.widget.CardView>
-
-    <TextView
-        android:id="@+id/textView5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:textColor="@color/black"
-        android:text="Upload your Profile Image"
-        app:layout_constraintStart_toEndOf="@+id/cardView2"
-        app:layout_constraintTop_toTopOf="@+id/cardView2" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/uploadBtn"
-        android:layout_width="110dp"
-        android:layout_height="35dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="5dp"
-        android:background="@drawable/btn_1"
-        android:elevation="8dp"
-        android:padding="10dp"
-        android:text="Upload Image"
-        android:textColor="@color/white"
-        android:textSize="10sp"
-        app:layout_constraintStart_toEndOf="@+id/cardView2"
-        app:layout_constraintTop_toBottomOf="@+id/textView5"
-        tools:ignore="SmallSp" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/namelayout"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="25dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="25dp"
-        android:textColorHint="@color/black"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/uploadBtn"
-        tools:ignore="Autofill">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/name"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/full_name"
-            android:inputType="text"
-            android:textColor="@color/black" />
+            android:paddingBottom="30dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <!-- Back button -->
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/backBTN"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="@drawable/back_arrow"
+                android:contentDescription="Back"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
+            <!-- Title -->
+            <TextView
+                android:id="@+id/titleText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Be Our Partner"
+                android:textColor="@color/black"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                app:layout_constraintStart_toEndOf="@id/backBTN"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/backBTN"
+                android:layout_marginStart="8dp" />
 
+            <!-- Logo Image and Upload -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/logoCard"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_marginTop="20dp"
+                app:cardCornerRadius="12dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/backBTN"
+                app:cardElevation="8dp">
 
+                <ImageView
+                    android:id="@+id/profPic"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_logo" />
+            </androidx.cardview.widget.CardView>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/emailLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="25dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="25dp"
-        android:textColorHint="@color/black"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/namelayout"
-        tools:ignore="Autofill">
+            <LinearLayout
+                android:id="@+id/uploadImageContainer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="16dp"
+                app:layout_constraintStart_toEndOf="@id/logoCard"
+                app:layout_constraintTop_toTopOf="@id/logoCard"
+                app:layout_constraintBottom_toBottomOf="@id/logoCard">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/email"
-            android:inputType="textEmailAddress"
-            android:textColor="@color/black" />
+                <TextView
+                    android:id="@+id/uploadLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Upload your Logo Image"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
 
-    </com.google.android.material.textfield.TextInputLayout>
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/uploadBtn"
+                    android:layout_width="140dp"
+                    android:layout_height="36dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/btn_1"
+                    android:text="Upload Image"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/admin_pass"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="25dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="25dp"
-        android:textColorHint="@color/black"
-        app:endIconTint="@color/black"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/emailLayout"
-        app:passwordToggleEnabled="true"
-        tools:ignore="Autofill">
+            <!-- Personal Information Section -->
+            <TextView
+                android:id="@+id/personalInfoHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Personal Information"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="30dp"
+                app:layout_constraintTop_toBottomOf="@id/logoCard"
+                app:layout_constraintStart_toStartOf="parent" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/password"
-            android:inputType="textPassword"
-            android:textColor="@color/black" />
+            <!-- Name -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/namelayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@id/personalInfoHeader"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:textColorHint="@color/black">
 
-    </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/full_name"
+                    android:inputType="textPersonName"
+                    android:textColor="@color/black" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/confirmLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="25dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="25dp"
-        android:textColorHint="@color/black"
-        app:endIconTint="@color/black"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/admin_pass"
-        app:passwordToggleEnabled="true"
-        tools:ignore="Autofill">
+            <!-- Email -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/emailLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@id/namelayout"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:textColorHint="@color/black">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/confirm"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/confirm_password"
-            android:inputType="textPassword"
-            android:textColor="@color/black" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/email"
+                    android:inputType="textEmailAddress"
+                    android:textColor="@color/black" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <!-- Phone Number -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/phoneLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@id/emailLayout"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:textColorHint="@color/black">
 
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/phone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Phone Number"
+                    android:inputType="phone"
+                    android:textColor="@color/black" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
-        android:id="@+id/submit"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:backgroundTint="@android:color/darker_gray"
-        android:gravity="center_vertical|center_horizontal"
-        android:text="@string/submit"
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="@+id/confirmLayout"
-        app:layout_constraintStart_toStartOf="@+id/confirmLayout"
-        app:layout_constraintTop_toBottomOf="@+id/checkBox" />
+            <!-- Password -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/passwordLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@id/phoneLayout"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:textColorHint="@color/black"
+                app:endIconTint="@color/black"
+                app:passwordToggleEnabled="true">
 
-    <CheckBox
-        android:id="@+id/checkBox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="I Accept the "
-        android:textColor="@color/black"
-        app:layout_constraintStart_toStartOf="@+id/confirmLayout"
-        app:layout_constraintTop_toBottomOf="@+id/confirmLayout" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/password"
+                    android:inputType="textPassword"
+                    android:textColor="@color/black" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/nav_terms"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:text="Terms and Conditions."
-        android:textColor="@color/blue"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/checkBox"
-        app:layout_constraintStart_toEndOf="@+id/checkBox"
-        app:layout_constraintTop_toTopOf="@+id/checkBox" />
+            <!-- Confirm Password -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/confirmLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@id/passwordLayout"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:textColorHint="@color/black"
+                app:endIconTint="@color/black"
+                app:passwordToggleEnabled="true">
 
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/confirm"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/confirm_password"
+                    android:inputType="textPassword"
+                    android:textColor="@color/black" />
+            </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Clinic Information Section -->
+            <TextView
+                android:id="@+id/clinicInfoHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Clinic Information"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="30dp"
+                app:layout_constraintTop_toBottomOf="@id/confirmLayout"
+                app:layout_constraintStart_toStartOf="parent" />
 
+            <!-- Clinic Name -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/clinicNameLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@id/clinicInfoHeader"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:textColorHint="@color/black">
 
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/clinicName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Clinic Name"
+                    android:inputType="text"
+                    android:textColor="@color/black" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Clinic Address -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/addressLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@id/clinicNameLayout"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:textColorHint="@color/black">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/clinicAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Clinic Address"
+                    android:inputType="textMultiLine"
+                    android:minLines="2"
+                    android:textColor="@color/black" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Clinic Phone -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/clinicPhoneLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@id/addressLayout"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:textColorHint="@color/black">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/clinicPhone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Clinic Phone Number"
+                    android:inputType="phone"
+                    android:textColor="@color/black" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Clinic Opening Day Label -->
+            <TextView
+                android:id="@+id/clinicOpenDayLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Clinic Opening Day"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@id/clinicPhoneLayout"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <!-- Clinic Opening Day Spinner -->
+            <Spinner
+                android:id="@+id/spinnerClinicOpenDay"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/clinicOpenDayLabel"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/spinnerClinicCloseDay"
+                android:layout_marginEnd="8dp"/>
+
+            <!-- Clinic Closing Day Label -->
+            <TextView
+                android:id="@+id/clinicCloseDayLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Clinic Closing Day"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@id/clinicPhoneLayout"
+                app:layout_constraintStart_toEndOf="@id/spinnerClinicOpenDay"
+                android:layout_marginStart="8dp" />
+
+            <!-- Clinic Closing Day Spinner -->
+            <Spinner
+                android:id="@+id/spinnerClinicCloseDay"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/clinicCloseDayLabel"
+                app:layout_constraintStart_toEndOf="@id/spinnerClinicOpenDay"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="8dp"/>
+
+            <!-- Clinic Opening Time Label -->
+            <TextView
+                android:id="@+id/clinicOpenTimeLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Clinic Opening Time"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@id/spinnerClinicOpenDay"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <!-- Clinic Opening Time Spinner -->
+            <Spinner
+                android:id="@+id/spinnerClinicOpenTime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintTop_toBottomOf="@id/clinicOpenTimeLabel"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/spinnerClinicCloseTime" />
+
+            <!-- Clinic Closing Time Label -->
+            <TextView
+                android:id="@+id/clinicCloseTimeLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Clinic Closing Time"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@id/spinnerClinicCloseDay"
+                app:layout_constraintStart_toEndOf="@id/spinnerClinicOpenTime"
+                android:layout_marginStart="8dp" />
+
+            <!-- Clinic Closing Time Spinner -->
+            <Spinner
+                android:id="@+id/spinnerClinicCloseTime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="8dp"
+                app:layout_constraintTop_toBottomOf="@id/clinicCloseTimeLabel"
+                app:layout_constraintStart_toEndOf="@id/spinnerClinicOpenTime"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- Terms and Conditions -->
+            <LinearLayout
+                android:id="@+id/termsContainer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/spinnerClinicCloseTime"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginBottom="24dp">
+
+                <CheckBox
+                    android:id="@+id/checkBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="I Accept the "
+                    android:textColor="@color/black" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/nav_terms"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:text="Terms and Conditions"
+                    android:textColor="@color/blue"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Documents Upload Section -->
+            <TextView
+                android:id="@+id/documentsHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Upload Documents"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintTop_toBottomOf="@id/termsContainer"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <GridLayout
+                android:id="@+id/documentsGrid"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:rowCount="3"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="24dp"
+                app:layout_constraintTop_toBottomOf="@id/documentsHeader"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <!-- BIR Upload -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:orientation="vertical"
+                    android:layout_margin="8dp">
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/uploadBirBtn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Upload BIR" />
+
+                    <ImageView
+                        android:id="@+id/birImageView"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
+                        android:layout_marginTop="8dp"
+                        android:contentDescription="BIR Image"
+                        android:scaleType="centerCrop"
+                        android:background="@color/gray" />
+                </LinearLayout>
+
+                <!-- Business Permit Upload -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:orientation="vertical"
+                    android:layout_margin="8dp">
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/uploadBusinessPermitBtn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Upload Business Permit" />
+
+                    <ImageView
+                        android:id="@+id/businessPermitImageView"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
+                        android:layout_marginTop="8dp"
+                        android:contentDescription="Business Permit Image"
+                        android:scaleType="centerCrop"
+                        android:background="@color/gray" />
+                </LinearLayout>
+
+                <!-- Valid ID Upload -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:orientation="vertical"
+                    android:layout_margin="8dp">
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/uploadValidIdBtn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Upload Valid ID" />
+
+                    <ImageView
+                        android:id="@+id/validIdImageView"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
+                        android:layout_marginTop="8dp"
+                        android:contentDescription="Valid ID Image"
+                        android:scaleType="centerCrop"
+                        android:background="@color/gray" />
+                </LinearLayout>
+            </GridLayout>
+
+            <!-- Submit Button -->
+            <Button
+                android:id="@+id/submit"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:backgroundTint="@color/colorPrimary"
+                android:text="Submit"
+                android:textColor="@android:color/white"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                app:layout_constraintTop_toBottomOf="@id/documentsGrid"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
