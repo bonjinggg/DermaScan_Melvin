@@ -52,7 +52,7 @@ class DermaRegister : AppCompatActivity() {
 
         mAuth = FirebaseAuth.getInstance()
         dDatabase = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
-            .getReference("dermaInfo")
+            .getReference("clinicInfo")
 
         setupClinicOpeningSpinners()
         setupClinicClosingSpinners()
@@ -204,30 +204,26 @@ class DermaRegister : AppCompatActivity() {
 
         return true
     }
-
     private fun submitRegistration() {
-        // Encode images to Base64 strings
         val profileImageEncoded = selectedProfileBitmap?.let { encodeImageToBase64(it) } ?: ""
         val birEncoded = encodeImageToBase64(birBitmap!!)
         val businessPermitEncoded = encodeImageToBase64(businessPermitBitmap!!)
         val validIdEncoded = encodeImageToBase64(validIdBitmap!!)
 
-        // Hash password
         val plainPassword = binding.password.text.toString().trim()
         val hashedPassword = BCrypt.hashpw(plainPassword, BCrypt.gensalt())
 
-        // Read spinner selections
         val selectedOpenDay = binding.spinnerClinicOpenDay.selectedItem as? String ?: ""
         val selectedCloseDay = binding.spinnerClinicCloseDay.selectedItem as? String ?: ""
         val selectedOpenTime = binding.spinnerClinicOpenTime.selectedItem as? String ?: ""
         val selectedCloseTime = binding.spinnerClinicCloseTime.selectedItem as? String ?: ""
 
-        // Build DermaInfo object (make sure DermaInfo class updated accordingly)
-        val dermaInfo = DermaInfo(
+        val clinicInfo = ClinicInfo(
             name = binding.name.text.toString().trim(),
             email = binding.email.text.toString().trim(),
-            role = "user",
+            role = "derma",
             contact = binding.phone.text.toString().trim(),
+
             clinicName = binding.clinicName.text.toString().trim(),
             clinicAddress = binding.clinicAddress.text.toString().trim(),
             clinicPhone = binding.clinicPhone.text.toString().trim(),
@@ -236,25 +232,43 @@ class DermaRegister : AppCompatActivity() {
             clinicCloseDay = selectedCloseDay,
             clinicOpenTime = selectedOpenTime,
             clinicCloseTime = selectedCloseTime,
-
-            profileImage = profileImageEncoded,
             birImage = birEncoded,
             businessPermitImage = businessPermitEncoded,
             validIdImage = validIdEncoded,
 
-            password = hashedPassword
+            password = hashedPassword,
+
+            // For ClinicProfile
+            logoImage = profileImageEncoded,
+            birDocument = birEncoded,
+            permitDocument = businessPermitEncoded,
+            address = binding.clinicAddress.text.toString().trim(),
+            openingTime = selectedOpenTime,
+            closingTime = selectedCloseTime,
+            operatingDays = "$selectedOpenDay to $selectedCloseDay",
+            tagline = "Welcome to our clinic!",
+            about = "Clinic description goes here...",
+            status = "pending",
+            acceptingPatients = true,
+            services = emptyList(),
+            dermatologists = emptyList()
         )
 
-        // Firebase create user and save data
-        mAuth.createUserWithEmailAndPassword(dermaInfo.email ?: "", plainPassword)
+        // Firebase Authentication and Database Save
+        mAuth.createUserWithEmailAndPassword(clinicInfo.email ?: "", plainPassword)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val uid = mAuth.currentUser?.uid
                     if (uid != null) {
-                        dDatabase.child(uid).setValue(dermaInfo)
+                        FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
+                            .getReference("clinicInfo")
+                            .child(uid)
+                            .setValue(clinicInfo)
                             .addOnSuccessListener {
                                 Toast.makeText(this, "Registration complete!", Toast.LENGTH_LONG).show()
-                                mAuth.signOut()
+                                // ✅ Navigate to ClinicProfile
+                                val intent = Intent(this, Login::class.java)
+                                startActivity(intent)
                                 finish()
                             }
                             .addOnFailureListener {

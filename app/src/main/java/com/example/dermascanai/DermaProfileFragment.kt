@@ -187,7 +187,7 @@ class DermaProfileFragment : Fragment() {
         }
 
         binding.btnToggleInfo.setOnClickListener {
-            val intent = Intent(requireContext(), DermaEditInfo::class.java)
+            val intent = Intent(requireContext(), ClinicProfile::class.java)
             startActivity(intent)
         }
         binding.editBannerIcon.setOnClickListener {
@@ -235,18 +235,18 @@ class DermaProfileFragment : Fragment() {
 
     private fun fetchUserData() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
-        val dermaRef: DatabaseReference = database.getReference("dermaInfo").child(userId ?: return)
+        val dermaRef: DatabaseReference = database.getReference("clinicInfo").child(userId ?: return)
 
         dermaRef.get().addOnSuccessListener { snapshot ->
             if (snapshot.exists()) {
-                val dermaInfo = snapshot.getValue(DermaInfo::class.java)
+                val dermaInfo = snapshot.getValue(ClinicInfo::class.java)
 
 
                 binding.fullName.setText(dermaInfo?.name ?: "")
                 val text = (dermaInfo?.status ?: "")
                 binding.status.text = "Status: $text "
 
-                dermaInfo?.profileImage?.let {
+                dermaInfo?.logoImage?.let {
                     if (it.isNotEmpty()) {
                         val decodedBytes = Base64.decode(it, Base64.DEFAULT)
                         val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)

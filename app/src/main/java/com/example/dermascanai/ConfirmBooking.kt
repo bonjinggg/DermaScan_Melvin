@@ -107,12 +107,12 @@ class ConfirmBooking : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
                     for (childSnapshot in snapshot.children) {
-                        val dermaInfo = childSnapshot.getValue(DermaInfo::class.java)
+                        val dermaInfo = childSnapshot.getValue(ClinicInfo::class.java)
                         if (dermaInfo != null) {
                             binding.docName.text = dermaInfo.name
                             doctorName = dermaInfo.name ?: ""
 
-                            dermaInfo.profileImage?.let {
+                            dermaInfo.logoImage?.let {
                                 if (it.isNotEmpty()) {
                                     try {
                                         val decodedBytes = Base64.decode(it, Base64.DEFAULT)

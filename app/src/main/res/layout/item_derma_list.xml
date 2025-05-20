@@ -1,89 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="150dp"
-    android:layout_height="210dp"
-    app:cardBackgroundColor="@color/white"
-    app:cardCornerRadius="25dp"
-    >
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="6dp">
 
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp">
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:gravity="center">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardPic"
+        <ImageView
+            android:id="@+id/imageViewProfile"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_profile2"
+            android:background="@drawable/bg_rounded"/>
+
+        <TextView
+            android:id="@+id/textViewName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="14dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            >
-            <ImageView
-                android:id="@+id/profPic"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/default_profile"
-                 />
-        </androidx.cardview.widget.CardView>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="9dp"
-            android:background="@color/grey"
-            app:layout_constraintBottom_toTopOf="@+id/name"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardPic" />
-
-        <TextView
-            android:id="@+id/name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="Dr, Dummy Account"
-            android:textColor="@color/black"
-            android:textSize="15sp"
+            android:text="Clinic Name"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardPic" />
+            android:layout_marginTop="8dp"
+            android:gravity="center"/>
 
+        <!-- Optional fields -->
         <TextView
-            android:id="@+id/dermaType"
+            android:id="@+id/textViewSpecialty"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cosmetic"
-            android:textColor="@color/blue"
-            android:textSize="15sp"
-            app:layout_constraintStart_toStartOf="@+id/name"
-            app:layout_constraintTop_toBottomOf="@+id/name" />
+            android:textColor="@android:color/darker_gray"
+            android:textSize="12sp"
+            android:gravity="center"/>
 
-        <ImageView
-            android:id="@+id/star"
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:src="@drawable/ic_star"
-            android:layout_marginEnd="10dp"
-            android:layout_marginTop="5dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/dermaType" />
-
-        <TextView
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="4.5"
-            android:textSize="15sp"
-            android:layout_marginEnd="5dp"
-            app:layout_constraintBottom_toBottomOf="@id/star"
-            app:layout_constraintEnd_toStartOf="@+id/star"
-            app:layout_constraintTop_toTopOf="@id/star" />
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp"
+            android:gravity="center">
 
+            <TextView
+                android:id="@+id/textViewRating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4.5"
+                android:textSize="12sp"
+                android:textColor="@android:color/black" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginStart="4dp"
+                android:src="@drawable/ic_star" />
+        </LinearLayout>
 
+    </LinearLayout>
 </androidx.cardview.widget.CardView>

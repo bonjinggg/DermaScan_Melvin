@@ -17,8 +17,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
-import com.example.dermascanai.BlogActivity
-import com.example.dermascanai.DoctorLists
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.dermascanai.databinding.FragmentHomeUserBinding
 import com.example.dermascanai.databinding.LayoutNotificationPopupBinding
 import com.google.android.material.navigation.NavigationView
@@ -44,6 +43,7 @@ class UserHomeFragment : Fragment() {
     private val notificationList = mutableListOf<Notification>()
 
 
+
     private val notificationRef = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
         .getReference("notifications")
 
@@ -54,6 +54,7 @@ class UserHomeFragment : Fragment() {
 
 
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -61,6 +62,7 @@ class UserHomeFragment : Fragment() {
         _binding = FragmentHomeUserBinding.inflate(inflater, container, false)
         return binding.root
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -76,8 +78,8 @@ class UserHomeFragment : Fragment() {
         mDatabase = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("userInfo")
 
 
-        val dermaList = mutableListOf<DermaInfo>()
-        val databaseRef = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("dermaInfo")
+        val clinicList = mutableListOf<ClinicInfo>()
+        val databaseRef = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("clinicInfo")
 
 
         val headerView = navView.getHeaderView(0)
@@ -94,6 +96,12 @@ class UserHomeFragment : Fragment() {
             ViewGroup.LayoutParams.WRAP_CONTENT,
             true
         )
+
+        val gridLayoutManager = GridLayoutManager(requireContext(), 2)
+        binding.dermaRecycleView.layoutManager = gridLayoutManager
+        binding.dermaRecycleView.adapter = AdapterDoctorList(clinicList)
+        binding.dermaRecycleView.setHasFixedSize(true)
+
 
 
         val notifRecyclerView = notificationBinding.notificationRecyclerView
@@ -207,32 +215,46 @@ class UserHomeFragment : Fragment() {
         })
 
         binding.dermaRecycleView.layoutManager = LinearLayoutManager(context)
+        // More robust error handling for the database query
         databaseRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                dermaList.clear()
+                clinicList.clear()
                 var count = 0
+
+                if (!snapshot.exists()) {
+                    Log.e("Database", "No data found at clinicInfo path")
+                    Toast.makeText(requireContext(), "No clinic data available", Toast.LENGTH_SHORT).show()
+                    return
+                }
+
                 for (userSnap in snapshot.children) {
-                    val user = userSnap.getValue(DermaInfo::class.java)
-                    if (user != null) {
-                        println("User found: ${user.name}, role: ${user.role}")
-                        if (user.role.lowercase() == "derma") {
-                            dermaList.add(user)
-                            count++
+                    try {
+                        val user = userSnap.getValue(ClinicInfo::class.java)
+                        if (user != null) {
+                            println("User found: ${user.name}, role: ${user.role}")
+                            if (user.role.lowercase() == "derma") {
+                                clinicList.add(user)
+                                count++
+                            }
                         }
+                    } catch (e: Exception) {
+                        Log.e("Database", "Error deserializing clinic data", e)
                     }
                 }
 
-                binding.dermaRecycleView.adapter = AdapterDermaHomeList(dermaList)
+                if (clinicList.isEmpty()) {
+                    Toast.makeText(requireContext(), "No derma clinics found", Toast.LENGTH_SHORT).show()
+                }
+
+                binding.dermaRecycleView.adapter = AdapterDermaHomeList(clinicList)
             }
 
-
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(requireContext(), "Failed to load users", Toast.LENGTH_SHORT).show()
+                Log.e("Database", "Database error: ${error.message}")
+                Toast.makeText(requireContext(), "Failed to load clinics: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
-
-
 
 
     override fun onDestroyView() {

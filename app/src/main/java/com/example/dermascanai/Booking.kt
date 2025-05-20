@@ -5,7 +5,9 @@ import android.graphics.Color
 import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
 import android.os.Bundle
+import android.view.Gravity
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -16,56 +18,205 @@ import java.util.Locale
 
 class Booking : AppCompatActivity() {
     private lateinit var binding: ActivityBookingBinding
-    private var selectedTimeSlot: Button? = null
+    private var selectedService: Button? = null
     private var selectedDate: Long = 0L
-    private var selectedTimeText: String = ""
+    private var selectedServiceText: String = ""
     private var patientEmail: String = ""
-    private var doctorEmail: String = ""
+    private var clinicName: String = ""
+    private var selectedDermatologist: Dermatologist? = null
     private lateinit var database: FirebaseDatabase
     private lateinit var bookingsRef: DatabaseReference
+    private val MAX_BOOKINGS_PER_DAY = 3
+
+    private val serviceButtons = mutableListOf<Button>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityBookingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Initialize Firebase
         database = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
         bookingsRef = database.getReference("bookings")
 
-        doctorEmail = intent.getStringExtra("doctorEmail") ?: ""
+        // Get intent data
         patientEmail = intent.getStringExtra("patientEmail") ?: ""
+        selectedDermatologist = intent.getParcelableExtra("selectedDermatologist")
+        clinicName = intent.getStringExtra("clinicName") ?: selectedDermatologist?.name ?: ""
 
-        // Check if user already has an active booking before allowing new ones
+        println("=== BOOKING ACTIVITY STARTED ===")
+        println("Patient Email: $patientEmail")
+        println("Clinic Name: $clinicName")
+        println("Selected Dermatologist: ${selectedDermatologist?.name}")
+
+        // Initialize components
+        setupToolbar()
+        setupCalendar()
+        fetchClinicServices()
         checkExistingBooking(patientEmail)
 
-        setupCalendar()
+        // Set up listeners
+        setupListeners()
+    }
 
+    private fun setupToolbar() {
         binding.backBTN.setOnClickListener {
             finish()
         }
+    }
 
-        // Setup date selection listener
+    private fun setupListeners() {
+        // Calendar date selection
         binding.calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
             handleDateSelection(year, month, dayOfMonth)
         }
 
-        // Setup time slot buttons
-        setupTimeSlotButtons()
-
-        // Setup confirm button
+        // Confirm button
         binding.btnConfirm.setOnClickListener {
-            // Double-check for existing bookings before proceeding
-            verifyNoExistingBookingsAndProceed()
+            if (selectedDate == 0L || selectedServiceText.isEmpty()) {
+                Toast.makeText(this, "Please select a date and service", Toast.LENGTH_SHORT).show()
+            } else {
+                verifyNoExistingBookingsAndProceed()
+            }
         }
     }
 
+    private fun fetchClinicServices() {
+        val clinicsRef = database.getReference("clinicInfo")
+
+        // Clear existing services and show loading
+        binding.servicesContainer.removeAllViews()
+        showLoadingForServices()
+
+        clinicsRef.get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()) {
+                val clinicSnapshot = snapshot.children.firstOrNull()
+                val clinicInfo = clinicSnapshot?.getValue(ClinicInfo::class.java)
+
+                if (clinicInfo != null) {
+                    displayClinicName(clinicInfo.name ?: "Unknown Clinic")
+
+                    if (clinicName.isEmpty()) {
+                        clinicName = clinicInfo.name ?: "Unknown Clinic"
+                    }
+
+                    val services = clinicInfo.services ?: listOf()
+                    if (services.isNotEmpty()) {
+                        setupDynamicServiceButtons(services)
+                    } else {
+                        showNoServicesMessage()
+                    }
+                } else {
+                    showNoClinicDataMessage()
+                }
+            } else {
+                showNoClinicDataMessage()
+            }
+        }.addOnFailureListener { error ->
+            Toast.makeText(this, "Error loading services: ${error.message}", Toast.LENGTH_SHORT).show()
+            clearServicesContainer()
+        }
+    }
+
+    private fun displayClinicName(clinicName: String) {
+        // You can update the toolbar title or show a toast
+        supportActionBar?.title = clinicName
+    }
+
+    private fun showLoadingForServices() {
+        val loadingText = android.widget.TextView(this)
+        loadingText.text = "Loading services..."
+        loadingText.gravity = Gravity.CENTER
+        loadingText.setPadding(16, 32, 16, 32)
+        loadingText.setTextColor(Color.GRAY)
+        loadingText.textSize = 16f
+        binding.servicesContainer.addView(loadingText)
+    }
+
+    private fun showNoServicesMessage() {
+        clearServicesContainer()
+        val messageText = android.widget.TextView(this)
+        messageText.text = "No services available for this clinic"
+        messageText.gravity = Gravity.CENTER
+        messageText.setPadding(16, 32, 16, 32)
+        messageText.setTextColor(Color.RED)
+        messageText.textSize = 16f
+        binding.servicesContainer.addView(messageText)
+
+        Toast.makeText(this, "No services found for this clinic", Toast.LENGTH_LONG).show()
+    }
+
+    private fun showNoClinicDataMessage() {
+        clearServicesContainer()
+        val messageText = android.widget.TextView(this)
+        messageText.text = "No clinic information available"
+        messageText.gravity = Gravity.CENTER
+        messageText.setPadding(16, 32, 16, 32)
+        messageText.setTextColor(Color.RED)
+        messageText.textSize = 16f
+        binding.servicesContainer.addView(messageText)
+
+        Toast.makeText(this, "No clinic information available", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun clearServicesContainer() {
+        binding.servicesContainer.removeAllViews()
+        serviceButtons.clear()
+    }
+
+    private fun setupDynamicServiceButtons(services: List<String>) {
+        clearServicesContainer()
+
+        // Create layout parameters for service buttons
+        val buttonLayoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            140 // Fixed height for consistency
+        )
+        buttonLayoutParams.setMargins(0, 0, 0, 16) // Bottom margin between buttons
+
+        for (service in services) {
+            val button = Button(this)
+            button.text = service
+            button.layoutParams = buttonLayoutParams
+
+            // Style the button to match your design
+            button.setBackgroundColor(Color.parseColor("#7A7A7A"))
+            button.setTextColor(Color.WHITE)
+            button.gravity = Gravity.CENTER
+            button.setPadding(16, 16, 16, 16)
+            button.textSize = 16f
+
+
+            button.background = resources.getDrawable(R.drawable.service_button_bg, null)
+
+            button.setOnClickListener {
+                if (button.isEnabled) {
+                    // Reset previous selection
+                    selectedService?.setBackgroundColor(Color.parseColor("#7A7A7A"))
+
+                    // Set new selection
+                    button.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                    selectedService = button
+                    selectedServiceText = button.text.toString()
+
+                    Toast.makeText(this, "Selected: $selectedServiceText", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            binding.servicesContainer.addView(button)
+            serviceButtons.add(button)
+        }
+
+        println("Successfully created ${serviceButtons.size} service buttons")
+    }
+
     private fun setupCalendar() {
-        // Set up calendar appearance
+        // Style the calendar
         binding.calendarView.setWeekSeparatorLineColor(Color.BLACK)
         binding.calendarView.setFocusedMonthDateColor(Color.BLACK)
         binding.calendarView.setUnfocusedMonthDateColor(Color.BLACK)
 
-        // Get current date and move to start of tomorrow
+        // Set minimum date to tomorrow
         val tomorrow = Calendar.getInstance()
         tomorrow.set(Calendar.HOUR_OF_DAY, 0)
         tomorrow.set(Calendar.MINUTE, 0)
@@ -73,48 +224,33 @@ class Booking : AppCompatActivity() {
         tomorrow.set(Calendar.MILLISECOND, 0)
         tomorrow.add(Calendar.DAY_OF_MONTH, 1)
 
-        // Set minimum date to tomorrow
         binding.calendarView.minDate = tomorrow.timeInMillis
     }
-
 
     private fun handleDateSelection(year: Int, month: Int, dayOfMonth: Int) {
         val calendar = Calendar.getInstance()
         calendar.set(year, month, dayOfMonth)
         selectedDate = calendar.timeInMillis
 
-        // Reset time slots when a new date is chosen
-        resetTimeSlots()
+        // Reset service selection when date changes
+        resetServiceSelection()
 
-        // Check for available time slots
-        fetchBookedTimeSlots(calendar.timeInMillis)
-    }
+        // Check availability for the selected date
+        checkAvailableBookingsForDate(selectedDate)
 
-    private fun setupTimeSlotButtons() {
-        val timeButtons = listOf(
-            binding.btn910, binding.btn1011, binding.btn1112,
-            binding.btn12, binding.btn23, binding.btn34, binding.btn45
-        )
-
-        for (btn in timeButtons) {
-            btn.setOnClickListener {
-                if (btn.isEnabled) {
-                    selectedTimeSlot?.setBackgroundColor(Color.parseColor("#7A7A7A"))
-                    btn.setBackgroundColor(Color.parseColor("#FFBB86FC"))
-                    selectedTimeSlot = btn
-                    selectedTimeText = btn.text.toString()
-                }
-            }
-        }
+        // Format and show selected date
+        val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+        val formattedDate = dateFormat.format(Date(selectedDate))
+        Toast.makeText(this, "Selected date: $formattedDate", Toast.LENGTH_SHORT).show()
     }
 
     private fun verifyNoExistingBookingsAndProceed() {
-        if (selectedDate == 0L || selectedTimeText.isEmpty()) {
-            Toast.makeText(this, "Please select a date and time slot", Toast.LENGTH_SHORT).show()
+        if (selectedDate == 0L || selectedServiceText.isEmpty()) {
+            Toast.makeText(this, "Please select a date and service", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // Final check to ensure user doesn't have any active bookings
+        // Check for existing bookings
         bookingsRef.orderByChild("patientEmail").equalTo(patientEmail)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -123,8 +259,6 @@ class Booking : AppCompatActivity() {
 
                     for (bookingSnapshot in snapshot.children) {
                         val status = bookingSnapshot.child("status").getValue(String::class.java)
-
-                        // Check for "Pending" or "Confirmed" status bookings
                         if (status == "Pending" || status == "Confirmed") {
                             hasActiveBooking = true
                             bookingStatus = status
@@ -136,51 +270,41 @@ class Booking : AppCompatActivity() {
                         AlertDialog.Builder(this@Booking)
                             .setTitle("Booking Already Exists")
                             .setMessage("You already have a $bookingStatus appointment. Please cancel it before booking a new one.")
-                            .setPositiveButton("OK") { dialog, _ ->
-                                dialog.dismiss()
-                            }
+                            .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .show()
                     } else {
-                        // Proceed with booking
                         proceedWithBooking()
                     }
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Toast.makeText(
-                        this@Booking,
-                        "Error checking bookings: ${error.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this@Booking, "Error checking bookings: ${error.message}", Toast.LENGTH_SHORT).show()
                 }
             })
     }
 
     private fun proceedWithBooking() {
-        // Prepare a booking ID using timestamp for uniqueness
         val bookingId = "${System.currentTimeMillis()}"
-
-        // Format the date for display
         val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
         val formattedDate = dateFormat.format(Date(selectedDate))
 
-        // Format the time for display
-        val formattedTime = formatTimeSlot(selectedTimeText)
-
-        // Pass to next activity
         val intent = Intent(this, ConfirmBooking::class.java)
         intent.putExtra("selectedDate", formattedDate)
-        intent.putExtra("selectedTime", formattedTime)
-        intent.putExtra("doctorEmail", doctorEmail)
+        intent.putExtra("selectedService", selectedServiceText)
         intent.putExtra("patientEmail", patientEmail)
+        intent.putExtra("clinicName", clinicName)
         intent.putExtra("bookingId", bookingId)
         intent.putExtra("timestampMillis", selectedDate)
+
+        selectedDermatologist?.let {
+            intent.putExtra("selectedDermatologist", it)
+        }
+
         startActivity(intent)
     }
 
     private fun checkExistingBooking(patientEmail: String) {
-        // Query ALL bookings for this patient, regardless of doctor
         bookingsRef.orderByChild("patientEmail").equalTo(patientEmail)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -189,8 +313,6 @@ class Booking : AppCompatActivity() {
 
                     for (bookingSnapshot in snapshot.children) {
                         val status = bookingSnapshot.child("status").getValue(String::class.java)
-
-                        // Check for "Pending" or "Confirmed" status bookings
                         if (status == "Pending" || status == "Confirmed") {
                             hasActiveBooking = true
                             bookingStatus = status
@@ -204,176 +326,88 @@ class Booking : AppCompatActivity() {
                             .setMessage("You already have a $bookingStatus appointment. Please cancel it before booking a new one.")
                             .setPositiveButton("OK") { dialog, _ ->
                                 dialog.dismiss()
-                                finish() // Return to previous screen after dismissing the dialog
+                                finish()
                             }
                             .setIcon(android.R.drawable.ic_dialog_alert)
-                            .setCancelable(false) // Prevent dismissing by tapping outside
+                            .setCancelable(false)
                             .show()
                     }
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Toast.makeText(
-                        this@Booking,
-                        "Error checking bookings: ${error.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this@Booking, "Error checking bookings: ${error.message}", Toast.LENGTH_SHORT).show()
                 }
             })
     }
 
-    private fun resetTimeSlots() {
-        // Reset all time slots to default state
-        val timeButtons = listOf(
-            binding.btn910, binding.btn1011, binding.btn1112,
-            binding.btn12, binding.btn23, binding.btn34, binding.btn45
-        )
-
-        for (btn in timeButtons) {
+    private fun resetServiceSelection() {
+        for (btn in serviceButtons) {
             btn.isEnabled = true
             btn.setBackgroundColor(Color.parseColor("#7A7A7A"))
             btn.setTextColor(Color.WHITE)
         }
 
-        selectedTimeSlot = null
-        selectedTimeText = ""
+        selectedService = null
+        selectedServiceText = ""
     }
 
-    private fun fetchBookedTimeSlots(selectedDateMillis: Long) {
-        // Convert milliseconds to date string format that matches your database
+    private fun checkAvailableBookingsForDate(selectedDateMillis: Long) {
         val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
         val selectedDateStr = dateFormat.format(Date(selectedDateMillis))
 
-        // Check if it's today, then disable past time slots
-        if (isToday(selectedDateMillis)) {
-            disablePastTimeSlots()
-        }
-
-        // First, check all bookings for this date regardless of doctor
-        // to disable slots that are already booked with ANY doctor
         bookingsRef.orderByChild("date").equalTo(selectedDateStr)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    for (bookingSnapshot in snapshot.children) {
-                        val timeFromDB = bookingSnapshot.child("time").getValue(String::class.java)
-                        val status = bookingSnapshot.child("status").getValue(String::class.java)
+                    var bookingsCount = 0
 
-                        // If there's a pending or confirmed booking in this time slot, disable it
+                    for (bookingSnapshot in snapshot.children) {
+                        val status = bookingSnapshot.child("status").getValue(String::class.java)
                         if (status == "Pending" || status == "Confirmed") {
-                            disableTimeSlot(timeFromDB)
+                            bookingsCount++
                         }
                     }
 
-                    // After checking all bookings, fetch doctor-specific bookings
-                    fetchDoctorBookings(selectedDateStr)
-                }
+                    val remainingBookings = MAX_BOOKINGS_PER_DAY - bookingsCount
+                    binding.bookingsAvailableText.text = "Available bookings: $remainingBookings/$MAX_BOOKINGS_PER_DAY"
 
-                override fun onCancelled(error: DatabaseError) {
-                    Toast.makeText(
-                        this@Booking,
-                        "Error fetching bookings: ${error.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            })
-    }
-
-    private fun fetchDoctorBookings(selectedDateStr: String) {
-        // Query Firebase for booked slots on this date for this doctor
-        bookingsRef.orderByChild("doctorEmail").equalTo(doctorEmail)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    for (bookingSnapshot in snapshot.children) {
-                        val dateFromDB = bookingSnapshot.child("date").getValue(String::class.java)
-                        val timeFromDB = bookingSnapshot.child("time").getValue(String::class.java)
-                        val status = bookingSnapshot.child("status").getValue(String::class.java)
-
-                        // If this booking is for the selected date and status is Pending or Confirmed
-                        if (dateFromDB == selectedDateStr && (status == "Pending" || status == "Confirmed")) {
-                            // Disable the corresponding time slot
-                            disableTimeSlot(timeFromDB)
-                        }
+                    if (bookingsCount >= MAX_BOOKINGS_PER_DAY) {
+                        disableAllServiceButtons()
+                        AlertDialog.Builder(this@Booking)
+                            .setTitle("No Availability")
+                            .setMessage("All bookings for this date have been filled. Please select another date.")
+                            .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show()
+                    } else {
+                        // Re-enable service buttons if they were disabled
+                        enableAllServiceButtons()
                     }
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Toast.makeText(
-                        this@Booking,
-                        "Error fetching doctor bookings: ${error.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this@Booking, "Error checking bookings: ${error.message}", Toast.LENGTH_SHORT).show()
                 }
             })
     }
-    private fun disableTimeSlot(bookedTime: String?) {
-        if (bookedTime == null) return
 
-        // Map the formatted time back to button
-        val buttonTime = when {
-            bookedTime.contains("9:00am to 10:00am") -> binding.btn910
-            bookedTime.contains("10:00am to 11:00am") -> binding.btn1011
-            bookedTime.contains("11:00am to 12:00pm") -> binding.btn1112
-            bookedTime.contains("1:00pm to 2:00pm") -> binding.btn12
-            bookedTime.contains("2:00pm to 3:00pm") -> binding.btn23
-            bookedTime.contains("3:00pm to 4:00pm") -> binding.btn34
-            bookedTime.contains("4:00pm to 5:00pm") -> binding.btn45
-            else -> null
+    private fun disableAllServiceButtons() {
+        for (btn in serviceButtons) {
+            btn.isEnabled = false
+            btn.setBackgroundColor(Color.LTGRAY)
+            btn.setTextColor(Color.DKGRAY)
         }
 
-        buttonTime?.let {
-            it.isEnabled = false
-            it.setBackgroundColor(Color.LTGRAY)
-            it.setTextColor(Color.DKGRAY)
-            // If this was the selected time slot, deselect it
-            if (selectedTimeSlot == it) {
-                selectedTimeSlot = null
-                selectedTimeText = ""
+        selectedService = null
+        selectedServiceText = ""
+    }
+
+    private fun enableAllServiceButtons() {
+        for (btn in serviceButtons) {
+            btn.isEnabled = true
+            if (btn != selectedService) {
+                btn.setBackgroundColor(Color.parseColor("#7A7A7A"))
+                btn.setTextColor(Color.WHITE)
             }
-        }
-    }
-
-    private fun isToday(timestamp: Long): Boolean {
-        val today = Calendar.getInstance()
-        val selectedCal = Calendar.getInstance()
-        selectedCal.timeInMillis = timestamp
-
-        return (today.get(Calendar.YEAR) == selectedCal.get(Calendar.YEAR) &&
-                today.get(Calendar.DAY_OF_YEAR) == selectedCal.get(Calendar.DAY_OF_YEAR))
-    }
-
-    private fun disablePastTimeSlots() {
-        val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-        val currentMinute = Calendar.getInstance().get(Calendar.MINUTE)
-
-        val timeButtons = listOf(
-            Pair(binding.btn910, 9),
-            Pair(binding.btn1011, 10),
-            Pair(binding.btn1112, 11),
-            Pair(binding.btn12, 13),
-            Pair(binding.btn23, 14),
-            Pair(binding.btn34, 15),
-            Pair(binding.btn45, 16)
-        )
-
-        for ((btn, hour) in timeButtons) {
-            if (currentHour > hour || (currentHour == hour && currentMinute >= 15)) {
-                btn.isEnabled = false
-                btn.setBackgroundColor(Color.LTGRAY)
-                btn.setTextColor(Color.DKGRAY)
-            }
-        }
-    }
-
-    private fun formatTimeSlot(rawSlot: String): String {
-        return when (rawSlot) {
-            "9-10 AM" -> "9:00am to 10:00am"
-            "10-11 AM" -> "10:00am to 11:00am"
-            "11-12 PM" -> "11:00am to 12:00pm"
-            "1-2 PM" -> "1:00pm to 2:00pm"
-            "2-3 PM" -> "2:00pm to 3:00pm"
-            "3-4 PM" -> "3:00pm to 4:00pm"
-            "4-5 PM" -> "4:00pm to 5:00pm"
-            else -> rawSlot  // fallback if already formatted
         }
     }
 }

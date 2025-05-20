@@ -35,7 +35,7 @@ class Login : AppCompatActivity() {
         mAuth = FirebaseAuth.getInstance()
         val database = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
         mDatabase = database.getReference("userInfo")
-        dDatabase = database.getReference("dermaInfo")
+        dDatabase = database.getReference("clinicInfo")
         val currentUser = mAuth.currentUser
         if (currentUser != null){
 

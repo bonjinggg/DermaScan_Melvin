@@ -11,7 +11,7 @@
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context=".DermaDetails">
+        tools:context=".ClinicProfileActivity">
 
         <ImageView
             android:id="@+id/backBtn"
@@ -34,6 +34,15 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/editProfileBtn"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:background="@drawable/ic_edit"
+            android:layout_margin="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <View
@@ -77,7 +86,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <ImageView
-                        android:id="@+id/profile"
+                        android:id="@+id/clinicLogo"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
@@ -93,74 +102,43 @@
                     android:textColor="@color/black"
                     android:textSize="22sp"
                     android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/rateMe"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/profilePicCard"
                     app:layout_constraintTop_toTopOf="@+id/profilePicCard" />
 
                 <TextView
-                    android:id="@+id/displaySpecialty"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/acceptingPatientsStatus"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:layout_marginTop="4dp"
-                    android:text="Clinic"
-                    android:textColor="@color/darkgrey"
-                    android:textSize="16sp"
-                    app:layout_constraintEnd_toStartOf="@+id/rateMe"
+                    android:background="@drawable/badge_green"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="Accepting New Patients"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp"
                     app:layout_constraintStart_toStartOf="@+id/displayName"
                     app:layout_constraintTop_toBottomOf="@+id/displayName" />
 
-                <Button
-                    android:id="@+id/rateMe"
-                    style="?attr/materialButtonOutlinedStyle"
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/displayTagline"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Rate Me"
+                    android:layout_marginTop="8dp"
+                    android:text="Clinic tagline will appear here..."
+                    android:textStyle="italic"
                     android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <LinearLayout
-                    android:id="@+id/ratingLayout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintStart_toStartOf="@+id/displaySpecialty"
-                    app:layout_constraintTop_toBottomOf="@+id/displaySpecialty">
-
-                    <ImageView
-                        android:id="@+id/starIcon"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_star" />
-
-                    <TextView
-                        android:id="@+id/ratingText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="4.5"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_marginStart="4dp" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/displayType"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Type: Cosmetic Dermatology"
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    app:layout_constraintStart_toStartOf="@+id/ratingLayout"
-                    app:layout_constraintTop_toBottomOf="@+id/ratingLayout" />
+                    app:layout_constraintStart_toStartOf="@+id/acceptingPatientsStatus"
+                    app:layout_constraintTop_toBottomOf="@+id/acceptingPatientsStatus" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Schedule Information Section -->
+        <!-- Clinic Information Section -->
         <androidx.cardview.widget.CardView
-            android:id="@+id/scheduleInfoCard"
+            android:id="@+id/clinicInfoCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
@@ -181,96 +159,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Schedule Information"
-                    android:textColor="@color/black"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp">
-
-                    <ImageView
-                        android:id="@+id/imageViewCalendar"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_calendar"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Clinic Days:"
-                        android:textColor="@color/black"
-                        android:textStyle="bold"
-                        android:layout_marginStart="8dp"/>
-
-                    <TextView
-                        android:id="@+id/clinicDaysText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Mon, Wed, Fri"
-                        android:textColor="@color/black"
-                        android:layout_marginStart="8dp"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp">
-
-                    <ImageView
-                        android:id="@+id/imageViewClock"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_clock"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Clinic Hours:"
-                        android:textColor="@color/black"
-                        android:textStyle="bold"
-                        android:layout_marginStart="8dp"/>
-
-                    <TextView
-                        android:id="@+id/clinicTimeText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="9:00 AM to 12:00 PM"
-                        android:textColor="@color/black"
-                        android:layout_marginStart="8dp"/>
-                </LinearLayout>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Contact Information Section -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/contactInfoCard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginEnd="15dp"
-            android:layout_marginTop="15dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:layout_constraintTop_toBottomOf="@+id/scheduleInfoCard"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Contact Information"
+                    android:text="Clinic Information"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -283,17 +172,17 @@
                     android:layout_marginTop="8dp">
 
                     <TextView
-                        android:layout_width="80dp"
+                        android:layout_width="120dp"
                         android:layout_height="wrap_content"
-                        android:text="Mobile:"
+                        android:text="Contact:"
                         android:textColor="@color/black"
                         android:textStyle="bold"/>
 
                     <TextView
-                        android:id="@+id/phone"
+                        android:id="@+id/displayContact"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="09123456789"
+                        android:text="Not specified"
                         android:textColor="@color/black"/>
                 </LinearLayout>
 
@@ -304,17 +193,17 @@
                     android:layout_marginTop="8dp">
 
                     <TextView
-                        android:layout_width="80dp"
+                        android:layout_width="120dp"
                         android:layout_height="wrap_content"
                         android:text="Email:"
                         android:textColor="@color/black"
                         android:textStyle="bold"/>
 
                     <TextView
-                        android:id="@+id/clinicEmail"
+                        android:id="@+id/displayEmail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="clinic@gmail.com"
+                        android:text="Not specified"
                         android:textColor="@color/black"/>
                 </LinearLayout>
 
@@ -325,7 +214,7 @@
                     android:layout_marginTop="8dp">
 
                     <TextView
-                        android:layout_width="80dp"
+                        android:layout_width="120dp"
                         android:layout_height="wrap_content"
                         android:text="Address:"
                         android:textColor="@color/black"
@@ -335,7 +224,49 @@
                         android:id="@+id/displayAddress"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Tagum City"
+                        android:text="Not specified"
+                        android:textColor="@color/black"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp">
+
+                    <TextView
+                        android:layout_width="120dp"
+                        android:layout_height="wrap_content"
+                        android:text="Operating Days:"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/displayOperatingDays"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Not specified"
+                        android:textColor="@color/black"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp">
+
+                    <TextView
+                        android:layout_width="120dp"
+                        android:layout_height="wrap_content"
+                        android:text="Hours:"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/displayOperatingHours"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Not specified"
                         android:textColor="@color/black"/>
                 </LinearLayout>
             </LinearLayout>
@@ -351,7 +282,7 @@
             android:layout_marginTop="15dp"
             app:cardCornerRadius="8dp"
             app:cardElevation="4dp"
-            app:layout_constraintTop_toBottomOf="@+id/contactInfoCard"
+            app:layout_constraintTop_toBottomOf="@+id/clinicInfoCard"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
@@ -364,17 +295,17 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="About"
+                    android:text="About Our Clinic"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp"/>
 
                 <TextView
-                    android:id="@+id/bio"
+                    android:id="@+id/displayAbout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Clinic bio and description will appear here..."
+                    android:text="Clinic description will appear here..."
                     android:textColor="@color/black"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -416,6 +347,7 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- Dermatologists Section -->
         <androidx.cardview.widget.CardView
             android:id="@+id/dermatologistsCard"
             android:layout_width="match_parent"
@@ -433,44 +365,102 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="16dp">
 
                 <TextView
-                    android:id="@+id/dermatologistsTitle"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Dermatologists"
+                    android:text="Our Dermatologists"
+                    android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:paddingBottom="8dp" />
+                    android:layout_marginBottom="8dp"/>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/dermatologistsRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false" />
-
+                    android:layout_marginTop="8dp"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-
-        <Button
-            android:id="@+id/appointmentBtn"
-            android:layout_width="0dp"
+        <!-- Verification Badge Section -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/verificationCard"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginEnd="15dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="15dp"
             android:layout_marginBottom="24dp"
-            android:text="Make an Appointment"
-            android:textAllCaps="false"
-            android:backgroundTint="?attr/colorPrimary"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
             app:layout_constraintTop_toBottomOf="@+id/dermatologistsCard"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintBottom_toBottomOf="parent">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:id="@+id/verifiedBadge"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/badge_green"
+                        android:layout_marginEnd="8dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Verified Clinic"
+                        android:textColor="@color/black"
+                        android:textSize="18sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/displayVerificationType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Verification: Business Permits &amp; Licenses"
+                    android:textColor="@color/black"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp">
+
+                    <ImageView
+                        android:id="@+id/birDocument"
+                        android:layout_width="0dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/verification_placeholder"/>
+
+                    <ImageView
+                        android:id="@+id/permitDocument"
+                        android:layout_width="0dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/verification_placeholder"/>
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

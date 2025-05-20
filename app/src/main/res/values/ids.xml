@@ -31,4 +31,12 @@
     <item name="height" type="id" />
     <item name="uploadLabel" type="id" />
     <item name="logoCard" type="id" />
+    <item name="textView19" type="id" />
+    <item name="textView7" type="id" />
+    <item name="rateMe" type="id" />
+    <item name="imageView4" type="id" />
+    <item name="textView20" type="id" />
+    <item name="labelClinicDays" type="id" />
+    <item name="textViewServicesLabel" type="id" />
+    <item name="cardViewServices" type="id" />
 </resources>

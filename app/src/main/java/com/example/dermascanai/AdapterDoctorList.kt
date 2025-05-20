@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dermascanai.databinding.ItemDermaUserBinding
 
-class AdapterDoctorList(private val userList: List<DermaInfo>) :
+class AdapterDoctorList(private val userList: List<ClinicInfo>) :
     RecyclerView.Adapter<AdapterDoctorList.DermaUserViewHolder>() {
 
     inner class DermaUserViewHolder(val binding: ItemDermaUserBinding) :
@@ -25,9 +25,9 @@ class AdapterDoctorList(private val userList: List<DermaInfo>) :
             textViewName.text = user.name
 
 
-            if (!user.profileImage.isNullOrEmpty()) {
+            if (!user.logoImage.isNullOrEmpty()) {
                 try {
-                    val decodedBytes = Base64.decode(user.profileImage, Base64.DEFAULT)
+                    val decodedBytes = Base64.decode(user.logoImage, Base64.DEFAULT)
                     val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
                     imageViewProfile.setImageBitmap(bitmap)
                 } catch (e: Exception) {
@@ -39,8 +39,8 @@ class AdapterDoctorList(private val userList: List<DermaInfo>) :
             }
             root.setOnClickListener {
                 val context = it.context
-                val intent = Intent(context, DermaDetails::class.java).apply {
-                    putExtra("userEmail", user.email) // assuming userId is in your DermaInfo model
+                val intent = Intent(context, ClinicDetails::class.java).apply {
+                    putExtra("userEmail", user.email)
                 }
                 context.startActivity(intent)
             }
