@@ -20,7 +20,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Enhanced Status bar with icon and better styling -->
         <LinearLayout
             android:id="@+id/statusHeader"
             android:layout_width="match_parent"
@@ -304,6 +303,21 @@
                 android:visibility="gone"
                 tools:visibility="visible">
 
+                <!-- Secondary action button (e.g., Reschedule) -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSecondaryAction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="Reschedule"
+                    android:textColor="@color/blue"
+                    android:backgroundTint="@android:color/transparent"
+                    app:strokeColor="@color/blue"
+                    app:strokeWidth="1dp"
+                    app:cornerRadius="8dp"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
 
                 <!-- Primary action button (Cancel) -->
                 <FrameLayout

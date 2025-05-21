@@ -1,9 +1,8 @@
 package com.example.dermascanai
 
-import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Base64
 import android.view.View
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -11,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dermascanai.databinding.ActivityBookingRecordsBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import java.text.SimpleDateFormat
 import java.util.*
 
 class BookingApprovalRecords : AppCompatActivity() {
@@ -20,7 +18,7 @@ class BookingApprovalRecords : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var adapter: BookingApprovalAdapter
     private val appointmentList = mutableListOf<BookingData>()
-    private lateinit var doctorEmail: String
+    private var clinicName: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,12 +28,14 @@ class BookingApprovalRecords : AppCompatActivity() {
         database = FirebaseDatabase.getInstance("https://dermascanai-2d7a1-default-rtdb.asia-southeast1.firebasedatabase.app/")
         auth = FirebaseAuth.getInstance()
 
-        doctorEmail = auth.currentUser?.email ?: ""
-        if (doctorEmail.isEmpty()) {
+        clinicName = auth.currentUser?.email ?: ""
+        if (clinicName.isEmpty()) {
             Toast.makeText(this, "Error: User not logged in", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
+
+        fetchClinicName()
 
         setupRecyclerView()
         loadPendingAppointments()
@@ -49,7 +49,6 @@ class BookingApprovalRecords : AppCompatActivity() {
             binding.allFilterChip.isChecked = false
             binding.approvedFilterChip.isChecked = false
             binding.declinedFilterChip.isChecked = false
-            binding.ongoingFilterChip.isChecked = false
             binding.cancelledFilterChip.isChecked = false
             loadPendingAppointments()
         }
@@ -59,7 +58,6 @@ class BookingApprovalRecords : AppCompatActivity() {
             binding.allFilterChip.isChecked = false
             binding.pendingFilterChip.isChecked = false
             binding.declinedFilterChip.isChecked = false
-            binding.ongoingFilterChip.isChecked = false
             binding.cancelledFilterChip.isChecked = false
             loadApprovedAppointments()
         }
@@ -69,7 +67,6 @@ class BookingApprovalRecords : AppCompatActivity() {
             binding.allFilterChip.isChecked = false
             binding.pendingFilterChip.isChecked = false
             binding.approvedFilterChip.isChecked = false
-            binding.ongoingFilterChip.isChecked = false
             binding.cancelledFilterChip.isChecked = false
             loadDeclineAppointments()
         }
@@ -80,18 +77,7 @@ class BookingApprovalRecords : AppCompatActivity() {
             binding.pendingFilterChip.isChecked = false
             binding.approvedFilterChip.isChecked = false
             binding.declinedFilterChip.isChecked = false
-            binding.ongoingFilterChip.isChecked = false
             loadCancelledAppointments()
-        }
-
-        binding.ongoingFilterChip.setOnClickListener {
-            binding.ongoingFilterChip.isChecked = true
-            binding.allFilterChip.isChecked = false
-            binding.pendingFilterChip.isChecked = false
-            binding.approvedFilterChip.isChecked = false
-            binding.declinedFilterChip.isChecked = false
-            binding.cancelledFilterChip.isChecked = false
-            loadOngoingAppointments()
         }
 
         binding.allFilterChip.setOnClickListener {
@@ -99,10 +85,36 @@ class BookingApprovalRecords : AppCompatActivity() {
             binding.pendingFilterChip.isChecked = false
             binding.approvedFilterChip.isChecked = false
             binding.declinedFilterChip.isChecked = false
-            binding.ongoingFilterChip.isChecked = false
             binding.cancelledFilterChip.isChecked = false
             loadAllAppointments()
         }
+    }
+
+    private fun fetchClinicName() {
+        val clinicRef = database.getReference("clinicName")
+            .child(clinicName.replace(".", ","))
+            .child("clinicName")
+
+        clinicRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                Log.d("BookingApprovalRecords", "Bookings found: ${snapshot.childrenCount}")
+                if (snapshot.exists()) {
+                    for (bookingSnapshot in snapshot.children) {
+                        Log.d("BookingApprovalRecords", "Booking key: ${bookingSnapshot.key}")
+                        val booking = bookingSnapshot.getValue(BookingData::class.java)
+                        if (booking != null) {
+                            Log.d("BookingApprovalRecords", "Booking status: ${booking.status}")
+                            appointmentList.add(booking)
+                        }
+                    }
+                }
+            }
+
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@BookingApprovalRecords, "Error fetching clinic name: ${error.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     private fun setupRecyclerView() {
@@ -120,8 +132,8 @@ class BookingApprovalRecords : AppCompatActivity() {
         binding.progressBar.visibility = View.VISIBLE
         appointmentList.clear()
 
-        val doctorBookingsRef = database.getReference("doctorBookings")
-            .child(doctorEmail.replace(".", ","))
+        val doctorBookingsRef = database.getReference("clinicBookings")
+            .child(clinicName.replace(".", ","))
 
         doctorBookingsRef.orderByChild("status").equalTo("pending")
             .addListenerForSingleValueEvent(object : ValueEventListener {
@@ -133,7 +145,6 @@ class BookingApprovalRecords : AppCompatActivity() {
                                 appointmentList.add(it)
                             }
                         }
-                        // Sort by appointment date/time (descending order - newest first)
                         appointmentList.sortByDescending { it.timestampMillis }
                         adapter.notifyDataSetChanged()
 
@@ -158,8 +169,8 @@ class BookingApprovalRecords : AppCompatActivity() {
         binding.progressBar.visibility = View.VISIBLE
         appointmentList.clear()
 
-        val doctorBookingsRef = database.getReference("doctorBookings")
-            .child(doctorEmail.replace(".", ","))
+        val doctorBookingsRef = database.getReference("clinicBookings")
+            .child(clinicName.replace(".", ","))
 
         doctorBookingsRef.orderByChild("status").equalTo("confirmed")
             .addListenerForSingleValueEvent(object : ValueEventListener {
@@ -196,8 +207,8 @@ class BookingApprovalRecords : AppCompatActivity() {
         binding.progressBar.visibility = View.VISIBLE
         appointmentList.clear()
 
-        val doctorBookingsRef = database.getReference("doctorBookings")
-            .child(doctorEmail.replace(".", ","))
+        val doctorBookingsRef = database.getReference("clinicBookings")
+            .child(clinicName.replace(".", ","))
 
         doctorBookingsRef.orderByChild("status").equalTo("declined")
             .addListenerForSingleValueEvent(object : ValueEventListener {
@@ -230,53 +241,14 @@ class BookingApprovalRecords : AppCompatActivity() {
             })
     }
 
-
     private fun loadCancelledAppointments() {
         binding.progressBar.visibility = View.VISIBLE
         appointmentList.clear()
 
-        val doctorBookingsRef = database.getReference("doctorBookings")
-            .child(doctorEmail.replace(".", ","))
+        val doctorBookingsRef = database.getReference("clinicBookings")
+            .child(clinicName.replace(".", ","))
 
         doctorBookingsRef.orderByChild("status").equalTo("cancelled")
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.exists()) {
-                        for (bookingSnapshot in snapshot.children) {
-                            val booking = bookingSnapshot.getValue(BookingData::class.java)
-                            booking?.let {
-                                appointmentList.add(it)
-                            }
-                        }
-                        // Sort by appointment date/time (descending order - newest first)
-                        appointmentList.sortByDescending { it.timestampMillis }
-                        adapter.notifyDataSetChanged()
-
-                        // Show empty state or content
-                        updateViewVisibility()
-                    } else {
-                        appointmentList.clear()
-                        adapter.notifyDataSetChanged()
-                        updateViewVisibility()
-                    }
-                    binding.progressBar.visibility = View.GONE
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Toast.makeText(this@BookingApprovalRecords, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
-                    binding.progressBar.visibility = View.GONE
-                }
-            })
-    }
-
-    private fun loadOngoingAppointments() {
-        binding.progressBar.visibility = View.VISIBLE
-        appointmentList.clear()
-
-        val doctorBookingsRef = database.getReference("doctorBookings")
-            .child(doctorEmail.replace(".", ","))
-
-        doctorBookingsRef.orderByChild("status").equalTo("ongoing")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()) {
@@ -311,8 +283,8 @@ class BookingApprovalRecords : AppCompatActivity() {
         binding.progressBar.visibility = View.VISIBLE
         appointmentList.clear()
 
-        val doctorBookingsRef = database.getReference("doctorBookings")
-            .child(doctorEmail.replace(".", ","))
+        val doctorBookingsRef = database.getReference("clinicBookings")
+            .child(clinicName.replace(".", ","))
 
         doctorBookingsRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -326,8 +298,6 @@ class BookingApprovalRecords : AppCompatActivity() {
                     // Sort by appointment date/time (descending order - newest first)
                     appointmentList.sortByDescending { it.timestampMillis }
                     adapter.notifyDataSetChanged()
-
-                    // Show empty state or content
                     updateViewVisibility()
                 } else {
                     appointmentList.clear()
@@ -344,7 +314,6 @@ class BookingApprovalRecords : AppCompatActivity() {
         })
     }
 
-    // Also update the updateViewVisibility() function to handle the cancelled empty state
     private fun updateViewVisibility() {
         if (appointmentList.isEmpty()) {
             // Show appropriate empty state based on selected filter
@@ -393,31 +362,33 @@ class BookingApprovalRecords : AppCompatActivity() {
     private fun updateBookingStatus(booking: BookingData, newStatus: String) {
         binding.progressBar.visibility = View.VISIBLE
 
-        // Check if approved appointment is for today, mark as ongoing
-        val finalStatus = if (newStatus == "confirmed" && isAppointmentForToday(booking)) {
-            "ongoing"
-        } else {
-            newStatus
-        }
-
         // Update status in all three locations
         val updates = HashMap<String, Any>()
 
         // Main bookings reference
-        updates["/bookings/${booking.bookingId}/status"] = finalStatus
+        updates["/bookings/${booking.bookingId}/status"] = newStatus
 
-        // Doctor bookings reference
-        updates["/doctorBookings/${booking.doctorEmail.replace(".", ",")}" +
-                "/${booking.bookingId}/status"] = finalStatus
+        // Clinic bookings reference
+        updates["/clinicBookings/${clinicName.replace(".", ",")}" +
+                "/${booking.bookingId}/status"] = newStatus
 
         // User bookings reference
         updates["/userBookings/${booking.patientEmail.replace(".", ",")}" +
-                "/${booking.bookingId}/status"] = finalStatus
+                "/${booking.bookingId}/status"] = newStatus
+
+        // Add clinic name if available
+        if (clinicName.isNotEmpty()) {
+            updates["/bookings/${booking.bookingId}/clinicName"] = clinicName
+            updates["/clinicBookings/${clinicName.replace(".", ",")}" +
+                    "/${booking.bookingId}/clinicName"] = clinicName
+            updates["/userBookings/${booking.patientEmail.replace(".", ",")}" +
+                    "/${booking.bookingId}/clinicName"] = clinicName
+        }
 
         // Add reason if it's a decline or cancellation
         if (booking.declineReason != null && booking.declineReason!!.isNotEmpty()) {
             updates["/bookings/${booking.bookingId}/declineReason"] = booking.declineReason!!
-            updates["/doctorBookings/${booking.doctorEmail.replace(".", ",")}" +
+            updates["/clinicBookings/${clinicName.replace(".", ",")}" +
                     "/${booking.bookingId}/declineReason"] = booking.declineReason!!
             updates["/userBookings/${booking.patientEmail.replace(".", ",")}" +
                     "/${booking.bookingId}/declineReason"] = booking.declineReason!!
@@ -426,7 +397,7 @@ class BookingApprovalRecords : AppCompatActivity() {
         // Add cancellation reason if present
         if (booking.cancellationReason != null && booking.cancellationReason!!.isNotEmpty()) {
             updates["/bookings/${booking.bookingId}/cancellationReason"] = booking.cancellationReason!!
-            updates["/doctorBookings/${booking.doctorEmail.replace(".", ",")}" +
+            updates["/clinicBookings/${clinicName.replace(".", ",")}" +
                     "/${booking.bookingId}/cancellationReason"] = booking.cancellationReason!!
             updates["/userBookings/${booking.patientEmail.replace(".", ",")}" +
                     "/${booking.bookingId}/cancellationReason"] = booking.cancellationReason!!
@@ -435,9 +406,8 @@ class BookingApprovalRecords : AppCompatActivity() {
         // Apply all updates atomically
         database.reference.updateChildren(updates)
             .addOnSuccessListener {
-                val statusMessage = when (finalStatus) {
+                val statusMessage = when (newStatus) {
                     "confirmed" -> "approved"
-                    "ongoing" -> "approved and marked as ongoing"
                     "cancelled" -> "cancelled"
                     else -> "declined"
                 }
@@ -458,34 +428,11 @@ class BookingApprovalRecords : AppCompatActivity() {
             }
     }
 
-    private fun isAppointmentForToday(booking: BookingData): Boolean {
-        // Get the date portion of the booking timestamp
-        val bookingCalendar = Calendar.getInstance().apply {
-            timeInMillis = booking.timestampMillis
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-
-        // Get today's date at midnight
-        val todayCalendar = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-
-        // Compare the dates
-        return bookingCalendar.timeInMillis == todayCalendar.timeInMillis
-    }
-
     private fun refreshCurrentView() {
         when {
             binding.pendingFilterChip.isChecked -> loadPendingAppointments()
             binding.approvedFilterChip.isChecked -> loadApprovedAppointments()
             binding.declinedFilterChip.isChecked -> loadDeclineAppointments()
-            binding.ongoingFilterChip.isChecked -> loadOngoingAppointments()
             binding.cancelledFilterChip.isChecked -> loadCancelledAppointments()
             else -> loadAllAppointments()
         }
@@ -526,11 +473,10 @@ class BookingApprovalRecords : AppCompatActivity() {
             val reason = input.text.toString().trim()
             if (reason.isNotEmpty()) {
                 booking.cancellationReason = reason
+                updateBookingStatus(booking, "cancelled")
             } else {
                 Toast.makeText(this, "Please provide a cancellation reason", Toast.LENGTH_SHORT).show()
-                return@setPositiveButton
             }
-            updateBookingStatus(booking, "cancelled")
         }
 
         builder.setNegativeButton("Back") { dialog, _ ->

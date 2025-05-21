@@ -3,17 +3,13 @@ package com.example.dermascanai
 data class Appointment(
     val bookingId: String = "",
     val patientEmail: String = "",
-    val doctorName: String = "",  // This is actually clinic name in the database
+    val doctorName: String = "",
     val date: String = "",
     val time: String = "",
     val service: String = "",
     val message: String = "",
     val status: String = "pending",
-    val timestampMillis: Long = 0,
+    val timestampMillis: Long = 0L,
     val createdAt: Long = System.currentTimeMillis(),
-    val cancellationReason: String? = null,
-    // New fields for rescheduling
-    val rescheduleRequestTimestamp: Long = 0,
-    val requestedNewDate: String = "",
-    val requestedNewTime: String = ""
+    val cancellationReason: String? = ""
 )

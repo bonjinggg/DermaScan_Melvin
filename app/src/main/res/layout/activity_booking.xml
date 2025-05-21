@@ -48,7 +48,7 @@
         android:layout_marginBottom="8dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="4dp"
-        app:layout_constraintBottom_toTopOf="@+id/btnConfirm"
+        app:layout_constraintBottom_toTopOf="@+id/btnNext"
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
         <ScrollView
@@ -184,13 +184,12 @@
                     android:layout_marginTop="4dp"
                     android:orientation="vertical"
                     android:paddingBottom="16dp">
-                    <!-- Service buttons will be added here dynamically -->
+
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
     </androidx.cardview.widget.CardView>
 
-    <!-- Enhanced confirm button with gradient and elevation -->
     <Button
         android:id="@+id/btnNext"
         android:layout_width="match_parent"
