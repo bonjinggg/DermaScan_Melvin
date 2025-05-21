@@ -110,7 +110,8 @@ class ConfirmBooking : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            saveBookingToFirebase()
+            // Check if user already has a booking before proceeding
+            checkExistingBooking()
         }
     }
 
@@ -147,6 +148,48 @@ class ConfirmBooking : AppCompatActivity() {
 
             override fun onCancelled(error: DatabaseError) {
                 Toast.makeText(this@ConfirmBooking, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    /**
+     * Check if the user already has an existing booking
+     * Only allow one active booking per user (pending, confirmed status)
+     */
+    private fun checkExistingBooking() {
+        val userBookingsRef = firebase.getReference("userBookings").child(patientEmail.replace(".", ","))
+
+        userBookingsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var hasActiveBooking = false
+
+                // Check all user's bookings
+                for (bookingSnapshot in snapshot.children) {
+                    val bookingData = bookingSnapshot.value as? HashMap<String, Any>
+                    val status = bookingData?.get("status") as? String
+
+                    // Consider booking as active if it's pending or confirmed
+                    if (status == "pending" || status == "confirmed") {
+                        hasActiveBooking = true
+                        break
+                    }
+                }
+
+                if (hasActiveBooking) {
+                    Toast.makeText(
+                        this@ConfirmBooking,
+                        "You already have an active booking. Please complete or cancel your existing booking before making a new one.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                } else {
+                    // User doesn't have an active booking, proceed with new booking
+                    saveBookingToFirebase()
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@ConfirmBooking, "Error checking existing bookings: ${error.message}", Toast.LENGTH_SHORT).show()
+                Log.e("ConfirmBooking", "Error checking existing bookings", error.toException())
             }
         })
     }

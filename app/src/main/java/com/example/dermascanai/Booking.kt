@@ -26,6 +26,7 @@ class Booking : AppCompatActivity() {
     private lateinit var database: FirebaseDatabase
     private lateinit var bookingsRef: DatabaseReference
     private val MAX_BOOKINGS_PER_DAY = 3
+    private val disabledDates = mutableSetOf<String>()
 
     private val serviceButtons = mutableListOf<Button>()
 
@@ -47,6 +48,7 @@ class Booking : AppCompatActivity() {
 
         // Initialize components
         setupToolbar()
+        loadBookedDates() // Load fully booked dates first
         setupCalendar()
         fetchClinicServices()
         checkExistingBooking(patientEmail)
@@ -67,14 +69,61 @@ class Booking : AppCompatActivity() {
             handleDateSelection(year, month, dayOfMonth)
         }
 
-        // Next button - Updated to use btnNext instead of btnConfirm
         binding.btnNext.setOnClickListener {
             if (selectedDate == 0L || selectedServiceText.isEmpty()) {
                 Toast.makeText(this, "Please select a date and service", Toast.LENGTH_SHORT).show()
             } else {
-                verifyNoExistingBookingsAndProceed()
+                proceedWithBooking()
             }
         }
+    }
+
+    private fun loadBookedDates() {
+        // Query all bookings to find fully booked dates
+        bookingsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                // Group bookings by date
+                val bookingsByDate = mutableMapOf<String, Int>()
+
+                for (bookingSnapshot in snapshot.children) {
+                    val date = bookingSnapshot.child("date").getValue(String::class.java) ?: continue
+                    val status = bookingSnapshot.child("status").getValue(String::class.java) ?: continue
+                    val clinic = bookingSnapshot.child("clinicName").getValue(String::class.java) ?: continue
+
+                    // Only count pending or confirmed bookings for the current clinic
+                    if ((status == "Pending" || status == "Confirmed") && clinic == clinicName) {
+                        bookingsByDate[date] = (bookingsByDate[date] ?: 0) + 1
+                    }
+                }
+
+                // Identify fully booked dates
+                for ((date, count) in bookingsByDate) {
+                    if (count >= MAX_BOOKINGS_PER_DAY) {
+                        disabledDates.add(date)
+                    }
+                }
+
+                // Update calendar UI to disable these dates
+                updateCalendarWithDisabledDates()
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@Booking, "Error loading booking data: ${error.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun updateCalendarWithDisabledDates() {
+        // If the calendar view doesn't directly support disabling dates, we'll handle it when a date is selected
+        if (disabledDates.isNotEmpty()) {
+            Toast.makeText(this, "Some dates are unavailable due to being fully booked", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun isDateFullyBooked(dateMillis: Long): Boolean {
+        val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+        val dateStr = dateFormat.format(Date(dateMillis))
+        return disabledDates.contains(dateStr)
     }
 
     private fun fetchClinicServices() {
@@ -113,7 +162,6 @@ class Booking : AppCompatActivity() {
             clearServicesContainer()
         }
     }
-
 
     private fun displayClinicName(clinicName: String) {
         // You can update the toolbar title or show a toast
@@ -183,7 +231,6 @@ class Booking : AppCompatActivity() {
             button.setPadding(16, 16, 16, 16)
             button.textSize = 16f
 
-
             button.background = resources.getDrawable(R.drawable.service_button_bg, null)
 
             button.setOnClickListener {
@@ -227,7 +274,18 @@ class Booking : AppCompatActivity() {
     private fun handleDateSelection(year: Int, month: Int, dayOfMonth: Int) {
         val calendar = Calendar.getInstance()
         calendar.set(year, month, dayOfMonth)
-        selectedDate = calendar.timeInMillis
+        val selectedDateMillis = calendar.timeInMillis
+
+        // Check if the date is already known to be fully booked
+        if (isDateFullyBooked(selectedDateMillis)) {
+            Toast.makeText(this, "This date is fully booked. Please select another date.", Toast.LENGTH_SHORT).show()
+            // Reset date selection
+            binding.calendarView.date = Calendar.getInstance().timeInMillis
+            return
+        }
+
+        // Update selected date
+        selectedDate = selectedDateMillis
 
         // Reset service selection when date changes
         resetServiceSelection()
@@ -239,46 +297,6 @@ class Booking : AppCompatActivity() {
         val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
         val formattedDate = dateFormat.format(Date(selectedDate))
         Toast.makeText(this, "Selected date: $formattedDate", Toast.LENGTH_SHORT).show()
-    }
-
-    private fun verifyNoExistingBookingsAndProceed() {
-        if (selectedDate == 0L || selectedServiceText.isEmpty()) {
-            Toast.makeText(this, "Please select a date and service", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // Check for existing bookings
-        bookingsRef.orderByChild("patientEmail").equalTo(patientEmail)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    var hasActiveBooking = false
-                    var bookingStatus = ""
-
-                    for (bookingSnapshot in snapshot.children) {
-                        val status = bookingSnapshot.child("status").getValue(String::class.java)
-                        if (status == "Pending" || status == "Confirmed") {
-                            hasActiveBooking = true
-                            bookingStatus = status
-                            break
-                        }
-                    }
-
-                    if (hasActiveBooking) {
-                        AlertDialog.Builder(this@Booking)
-                            .setTitle("Booking Already Exists")
-                            .setMessage("You already have a $bookingStatus appointment. Please cancel it before booking a new one.")
-                            .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show()
-                    } else {
-                        proceedWithBooking()
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Toast.makeText(this@Booking, "Error checking bookings: ${error.message}", Toast.LENGTH_SHORT).show()
-                }
-            })
     }
 
     private fun proceedWithBooking() {
@@ -293,7 +311,6 @@ class Booking : AppCompatActivity() {
         intent.putExtra("clinicName", clinicName)
         intent.putExtra("bookingId", bookingId)
         intent.putExtra("timestampMillis", selectedDate)
-
 
         startActivity(intent)
     }
@@ -356,7 +373,10 @@ class Booking : AppCompatActivity() {
 
                     for (bookingSnapshot in snapshot.children) {
                         val status = bookingSnapshot.child("status").getValue(String::class.java)
-                        if (status == "Pending" || status == "Confirmed") {
+                        val clinic = bookingSnapshot.child("clinicName").getValue(String::class.java)
+
+                        // Only count bookings for the current clinic
+                        if ((status == "Pending" || status == "Confirmed") && clinic == clinicName) {
                             bookingsCount++
                         }
                     }
@@ -365,15 +385,24 @@ class Booking : AppCompatActivity() {
                     binding.bookingsAvailableText.text = "Available bookings: $remainingBookings/$MAX_BOOKINGS_PER_DAY"
 
                     if (bookingsCount >= MAX_BOOKINGS_PER_DAY) {
+                        // Add this date to disabled dates
+                        disabledDates.add(selectedDateStr)
+
+                        // Disable service selection
                         disableAllServiceButtons()
+
                         AlertDialog.Builder(this@Booking)
                             .setTitle("No Availability")
                             .setMessage("All bookings for this date have been filled. Please select another date.")
-                            .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+                            .setPositiveButton("OK") { dialog, _ ->
+                                dialog.dismiss()
+                                // Reset date selection
+                                binding.calendarView.date = Calendar.getInstance().timeInMillis
+                                selectedDate = 0L
+                            }
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .show()
                     } else {
-                        // Re-enable service buttons if they were disabled
                         enableAllServiceButtons()
                     }
                 }

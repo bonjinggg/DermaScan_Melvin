@@ -49,23 +49,20 @@ class BookingApprovalAdapter(
                 binding.bookingIdTextView.text = "#${booking.bookingId.take(8).uppercase()}"
             }
 
-            // Set clinic name if available, otherwise use a default
-            val clinicDisplayName = if (!booking.clinicName.isNullOrEmpty()) {
-                booking.clinicName
+            // Display the service instead of clinic name
+            val serviceDisplayName = if (!booking.service.isNullOrEmpty()) {
+                booking.service
             } else {
                 "General Consultation"
             }
-            binding.serviceTextView.text = clinicDisplayName
+            binding.serviceTextView.text = serviceDisplayName
 
-            // Format and set booking timestamp
             val bookingDateFormat = SimpleDateFormat("MMM dd, yyyy 'at' h:mm a", Locale.getDefault())
             val bookingTimestamp = if (booking.createdAt > 0) booking.createdAt else booking.timestampMillis
             binding.bookingTimestampTv.text = "Booked on ${bookingDateFormat.format(Date(bookingTimestamp))}"
 
-            // Configure status elements and buttons based on status
             configureStatusElements(booking)
 
-            // Handle decline reason visibility
             if (!booking.declineReason.isNullOrEmpty() && booking.status == "declined") {
                 binding.declineReasonLayout.visibility = View.VISIBLE
                 binding.declineReasonTv.text = booking.declineReason
@@ -73,7 +70,6 @@ class BookingApprovalAdapter(
                 binding.declineReasonLayout.visibility = View.GONE
             }
 
-            // Handle cancellation reason visibility
             if (!booking.cancellationReason.isNullOrEmpty() && booking.status == "cancelled") {
                 binding.cancellationReasonLayout.visibility = View.VISIBLE
                 binding.cancellationReasonTv.text = booking.cancellationReason
@@ -81,7 +77,6 @@ class BookingApprovalAdapter(
                 binding.cancellationReasonLayout.visibility = View.GONE
             }
 
-            // Set click listeners
             binding.approveButton.setOnClickListener {
                 onApprove(booking)
             }
@@ -96,10 +91,8 @@ class BookingApprovalAdapter(
         }
 
         private fun configureStatusElements(booking: BookingData) {
-            // Set action buttons and layout visibility based on status
             when (booking.status) {
                 "pending" -> {
-                    // Show approval buttons for pending appointments
                     binding.approvalButtonsLayout.visibility = View.VISIBLE
                     binding.approveButton.visibility = View.VISIBLE
                     binding.declineButton.visibility = View.VISIBLE
@@ -107,7 +100,6 @@ class BookingApprovalAdapter(
                     binding.statusLayout.visibility = View.GONE
                 }
                 "confirmed" -> {
-                    // Show cancel button for confirmed appointments
                     binding.approvalButtonsLayout.visibility = View.GONE
                     binding.cancelButton.visibility = View.VISIBLE
                     binding.statusLayout.visibility = View.VISIBLE

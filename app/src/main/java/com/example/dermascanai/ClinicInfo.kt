@@ -17,6 +17,9 @@ data class ClinicInfo(
     var province: String? = null,
     var city: String? = null,
     var barangay: String? = null,
+    var phone: String? = null,
+    val profileImage: String? = null,
+    val stability: String? = null,
     var quote: String? = null,
     var bio: String? = null,
     var verificationImg: String? = null,
@@ -31,6 +34,7 @@ data class ClinicInfo(
     val closingTime: String? = null,
     val about: String? = null,
     val logoImage: String? = null,
+    val isStable: Boolean = false,
     val birDocument: String? = null,
     val permitDocument: String? = null,
     val services: List<String>? = null,
@@ -40,8 +44,6 @@ data class ClinicInfo(
     val description: String = "",
     val rating: Float = 0.0f,
     val availability: String = "",
-
-
 
     // Clinic Information combined here
     var clinicName: String? = null,

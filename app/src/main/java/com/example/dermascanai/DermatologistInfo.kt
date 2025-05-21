@@ -9,5 +9,6 @@ data class Dermatologist(
     val specialization: String? = null,
     var email: String? = null,
     var phone: String? = null,
-    var logoImage: String? = null
+    var logoImage: String? = null,
+    val stability: String? = null
 ) : Parcelable

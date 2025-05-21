@@ -10,6 +10,7 @@ data class BookingData(
     val message: String = "",
     val timestampMillis: Long = 0,
     val createdAt: Long = 0,
+    val service: String = "",
     val status: String = "pending",
     var declineReason: String? = null,
     var cancellationReason: String? = null

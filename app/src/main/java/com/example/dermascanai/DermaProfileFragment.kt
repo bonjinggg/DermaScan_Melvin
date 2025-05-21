@@ -47,10 +47,11 @@ class DermaProfileFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentDermaProfileBinding.inflate(inflater, container, false)
         return binding.root
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -238,28 +239,32 @@ class DermaProfileFragment : Fragment() {
         val dermaRef: DatabaseReference = database.getReference("clinicInfo").child(userId ?: return)
 
         dermaRef.get().addOnSuccessListener { snapshot ->
+            if (!isAdded || _binding == null) return@addOnSuccessListener
+
             if (snapshot.exists()) {
                 val dermaInfo = snapshot.getValue(ClinicInfo::class.java)
 
+                _binding?.apply {
+                    fullName.text = dermaInfo?.name ?: ""
+                    val text = (dermaInfo?.status ?: "")
+                    status.text = "Status: $text"
 
-                binding.fullName.setText(dermaInfo?.name ?: "")
-                val text = (dermaInfo?.status ?: "")
-                binding.status.text = "Status: $text "
-
-                dermaInfo?.logoImage?.let {
-                    if (it.isNotEmpty()) {
-                        val decodedBytes = Base64.decode(it, Base64.DEFAULT)
-                        val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
-                        binding.profPic.setImageBitmap(bitmap)
+                    dermaInfo?.logoImage?.let {
+                        if (it.isNotEmpty()) {
+                            val decodedBytes = Base64.decode(it, Base64.DEFAULT)
+                            val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+                            profPic.setImageBitmap(bitmap)
+                        }
                     }
                 }
             } else {
-//                Toast.makeText(this, "No user data found", Toast.LENGTH_SHORT).show()
             }
         }.addOnFailureListener {
-//            Toast.makeText(this, "Failed to fetch user data: ${it.message}", Toast.LENGTH_SHORT).show()
+            if (!isAdded || _binding == null) return@addOnFailureListener
         }
     }
+
+
 
     private fun logoutUser() {
         val builder = android.app.AlertDialog.Builder(requireContext())
