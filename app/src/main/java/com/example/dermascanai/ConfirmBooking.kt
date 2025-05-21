@@ -38,11 +38,10 @@ class ConfirmBooking : AppCompatActivity() {
     private var bookingId: String = ""
     private var selectedDate: String = ""
     private var selectedTime: String = ""
-    private var doctorEmail: String = ""
+    private var selectedService: String = ""
     private var patientEmail: String = ""
-    private var name: String = ""
+    private var clinicName: String = ""
     private var timestampMillis: Long = 0L
-    private var doctorName: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,8 +55,9 @@ class ConfirmBooking : AppCompatActivity() {
 
         // Get values from intent
         selectedDate = intent.getStringExtra("selectedDate") ?: ""
-        selectedTime = intent.getStringExtra("selectedTime") ?: ""
-        doctorEmail = intent.getStringExtra("doctorEmail") ?: ""
+        selectedTime = intent.getStringExtra("selectedTime") ?: "Any available time"
+        selectedService = intent.getStringExtra("selectedService") ?: ""
+        clinicName = intent.getStringExtra("clinicName") ?: ""
         timestampMillis = intent.getLongExtra("timestampMillis", System.currentTimeMillis())
         bookingId = intent.getStringExtra("bookingId") ?: System.currentTimeMillis().toString()
 
@@ -71,8 +71,8 @@ class ConfirmBooking : AppCompatActivity() {
 
         binding.messageEditText.hint = "Message from $patientEmail"
 
-        if (doctorEmail.isEmpty()) {
-            Toast.makeText(this, "Doctor email not found", Toast.LENGTH_SHORT).show()
+        if (clinicName.isEmpty()) {
+            Toast.makeText(this, "Clinic name not found", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
@@ -81,27 +81,42 @@ class ConfirmBooking : AppCompatActivity() {
             showEmojiPopup(it)
         }
 
-        fetchUserData(doctorEmail)
+        fetchUserData(clinicName)
 
         binding.backBTN.setOnClickListener {
             finish()
         }
 
+        // Set selected date only (removed time display)
         binding.date.text = selectedDate
-        binding.time.text = selectedTime
+
+        // Add service display - make sure you have a TextView for this in your layout
+        try {
+            binding.serviceText.text = selectedService
+        } catch (e: Exception) {
+            Log.e("ConfirmBooking", "Error setting service text: ${e.message}")
+        }
 
         binding.confirm.setOnClickListener {
             if (patientEmail.isEmpty()) {
                 Toast.makeText(this, "You must be logged in to book an appointment", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+
+            // Validate that message is not empty
+            val messageText = binding.messageEditText.text.toString().trim()
+            if (messageText.isEmpty()) {
+                Toast.makeText(this, "Please enter a message", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             saveBookingToFirebase()
         }
     }
 
-    private fun fetchUserData(docEmail: String) {
-        database = firebase.getReference("dermaInfo")
-        val query = database.orderByChild("email").equalTo(docEmail)
+    private fun fetchUserData(clinicNameParam: String) {
+        database = firebase.getReference("clinicInfo")
+        val query = database.orderByChild("name").equalTo(clinicNameParam)
 
         query.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -109,8 +124,8 @@ class ConfirmBooking : AppCompatActivity() {
                     for (childSnapshot in snapshot.children) {
                         val dermaInfo = childSnapshot.getValue(ClinicInfo::class.java)
                         if (dermaInfo != null) {
-                            binding.docName.text = dermaInfo.name
-                            doctorName = dermaInfo.name ?: ""
+                            binding.ClinicName.text = dermaInfo.name
+                            clinicName = dermaInfo.name ?: ""
 
                             dermaInfo.logoImage?.let {
                                 if (it.isNotEmpty()) {
@@ -126,7 +141,7 @@ class ConfirmBooking : AppCompatActivity() {
                         }
                     }
                 } else {
-                    Toast.makeText(this@ConfirmBooking, "No matching derma found", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@ConfirmBooking, "No matching clinic found", Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -137,7 +152,13 @@ class ConfirmBooking : AppCompatActivity() {
     }
 
     private fun saveBookingToFirebase() {
-        val messageText = binding.messageEditText.text.toString()
+        val messageText = binding.messageEditText.text.toString().trim()
+
+        // Validate message is not empty
+        if (messageText.isEmpty()) {
+            Toast.makeText(this, "Please enter a message", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         // Get reference to bookings
         val bookingsRef = firebase.getReference("bookings")
@@ -146,25 +167,26 @@ class ConfirmBooking : AppCompatActivity() {
         val booking = HashMap<String, Any>()
         booking["bookingId"] = bookingId
         booking["patientEmail"] = patientEmail
-        booking["doctorEmail"] = doctorEmail
-        booking["doctorName"] = doctorName
+        booking["clinicName"] = clinicName
         booking["date"] = selectedDate
-        booking["time"] = selectedTime
-        booking["message"] = messageText
+        booking["service"] = selectedService
+        booking["message"] = messageText  // Ensure message is saved
         booking["status"] = "pending" // pending, confirmed, cancelled, completed
         booking["timestampMillis"] = timestampMillis
         booking["createdAt"] = System.currentTimeMillis()
+
+        Log.d("ConfirmBooking", "Saving booking with message: $messageText")
 
         // Save in Firebase
         bookingsRef.child(bookingId).setValue(booking)
             .addOnSuccessListener {
                 Toast.makeText(this, "Booking confirmed successfully!", Toast.LENGTH_SHORT).show()
 
-
                 val userBookingsRef = firebase.getReference("userBookings").child(patientEmail.replace(".", ","))
                 userBookingsRef.child(bookingId).setValue(booking)
 
-                val doctorBookingsRef = firebase.getReference("doctorBookings").child(doctorEmail.replace(".", ","))
+                // Use clinic name for doctor bookings reference instead of email
+                val doctorBookingsRef = firebase.getReference("clinicBookings").child(clinicName.replace(" ", "_").replace(".", ","))
                 doctorBookingsRef.child(bookingId).setValue(booking)
 
                 val intent = Intent(this, BookingHistory::class.java)
@@ -174,6 +196,7 @@ class ConfirmBooking : AppCompatActivity() {
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Error saving booking: ${e.message}", Toast.LENGTH_SHORT).show()
+                Log.e("ConfirmBooking", "Error saving booking", e)
             }
     }
 

@@ -192,13 +192,13 @@
 
     <!-- Enhanced confirm button with gradient and elevation -->
     <Button
-        android:id="@+id/btnConfirm"
+        android:id="@+id/btnNext"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_margin="16dp"
         android:shadowRadius="@integer/google_play_services_version"
         android:background="@drawable/toolbar_gradient_bg"
-        android:text="Confirm Booking"
+        android:text="Next"
         android:textColor="@color/white"
         android:textSize="16sp"
         android:textAllCaps="false"

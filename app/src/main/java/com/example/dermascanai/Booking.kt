@@ -23,7 +23,6 @@ class Booking : AppCompatActivity() {
     private var selectedServiceText: String = ""
     private var patientEmail: String = ""
     private var clinicName: String = ""
-    private var selectedDermatologist: Dermatologist? = null
     private lateinit var database: FirebaseDatabase
     private lateinit var bookingsRef: DatabaseReference
     private val MAX_BOOKINGS_PER_DAY = 3
@@ -41,13 +40,10 @@ class Booking : AppCompatActivity() {
 
         // Get intent data
         patientEmail = intent.getStringExtra("patientEmail") ?: ""
-        selectedDermatologist = intent.getParcelableExtra("selectedDermatologist")
-        clinicName = intent.getStringExtra("clinicName") ?: selectedDermatologist?.name ?: ""
+        clinicName = intent.getStringExtra("clinicName") ?: ""
 
-        println("=== BOOKING ACTIVITY STARTED ===")
         println("Patient Email: $patientEmail")
         println("Clinic Name: $clinicName")
-        println("Selected Dermatologist: ${selectedDermatologist?.name}")
 
         // Initialize components
         setupToolbar()
@@ -71,8 +67,8 @@ class Booking : AppCompatActivity() {
             handleDateSelection(year, month, dayOfMonth)
         }
 
-        // Confirm button
-        binding.btnConfirm.setOnClickListener {
+        // Next button - Updated to use btnNext instead of btnConfirm
+        binding.btnNext.setOnClickListener {
             if (selectedDate == 0L || selectedServiceText.isEmpty()) {
                 Toast.makeText(this, "Please select a date and service", Toast.LENGTH_SHORT).show()
             } else {
@@ -117,6 +113,7 @@ class Booking : AppCompatActivity() {
             clearServicesContainer()
         }
     }
+
 
     private fun displayClinicName(clinicName: String) {
         // You can update the toolbar title or show a toast
@@ -297,9 +294,6 @@ class Booking : AppCompatActivity() {
         intent.putExtra("bookingId", bookingId)
         intent.putExtra("timestampMillis", selectedDate)
 
-        selectedDermatologist?.let {
-            intent.putExtra("selectedDermatologist", it)
-        }
 
         startActivity(intent)
     }
